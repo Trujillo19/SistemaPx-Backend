@@ -1,0 +1,4 @@
+node_modules/
+
+api/config/production.env
+api/config/development.env
