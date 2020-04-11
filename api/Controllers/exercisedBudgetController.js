@@ -125,7 +125,7 @@ exports.createExercised = async (req, res, next) => {
             }
             else {
                 // I'm not sure if this async functions will cause trubble latter, for now it works.
-                await exercisedBudget.deleteOne({exerciseDate: inputDate});
+                var deleted = await exercisedBudget.deleteOne({exerciseDate: inputDate});
                 var exerciseMany = await ExercisedBudget.create({createdBy: req.user, createdAt: Date.now(), exerciseDate: inputDate, gm: GM_clasificado, subdireccion: Subdireccion_clasificado,
                     importe: Importe_clasificado, ledger: Ledger_clasificado, entidadCp: EntidadCp_clasificado, ano: ano_clasificado,
                     tipodeVa: tipoDeVa_clasificado, elementoPep: elemetoPep_clasificado, fondo: fondo_clasificado, centroGestor: centroGestor_clasificado,
@@ -192,85 +192,106 @@ exports.getExercised = async (req, res, next) => {
     var GSSLT = [];
     const startDate = new Date(req.query.start);
     const endDate = new Date(req.query.end);
-    if (endDate - startDate < 0 ) {
-        return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
-    }
-    else if (endDate - startDate >= 0) {
-        var document = [];
-        var manyExercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
-        console.log(manyExercise);
-        // This is the number of months being retreive.
-        var manyExerciseLength = manyExercise.length;
-        console.log(manyExerciseLength);
-        if (manyExerciseLength === 0){
-            return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
+    try {
+        if (endDate - startDate < 0 ) {
+            return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
         }
-        manyExercise.forEach((element, i) => {
-            document[i] = Object.values(element._doc);
-        });
-        // The first item is month, second it's the column inside the Excel file and third is the row.
-        for (var i = 0; i<=manyExerciseLength-1; i++){
-            AA[i] = 0;
-            CGDUOS[i] = 0;
-            CSTPIP[i] = 0;
-            GMDE[i] = 0;
-            GMGE[i] = 0;
-            GMM[i] = 0;
-            GMOPI[i] = 0;
-            CSTPIP[i] = 0;
-            GSMCCIT[i] = 0;
-            GSSLT[i] = 0;
-            var rowLength = document[i][0].length;
-            for (var j = 0; j<=rowLength-1; j++){
-                switch (document[i][0][j]) {
-                    case 'AA':
-                        AA[i] = AA[i] + document[i][2][j];
-                        break;
-                    case 'CGDUOS':
-                        CGDUOS[i] = CGDUOS[i] + document[i][2][j];
-                        break;
-                    case 'GMDE':
-                        GMDE[i] = GMDE[i] + document[i][2][j];
-                        break;
-                    case 'GMGE':
-                        GMGE[i] = GMGE[i] + document[i][2][j];
-                        break;
-                    case 'GMM':
-                        GMM[i] = GMM[i] + document[i][2][j];
-                        break;
-                    case 'GMOPI':
-                        GMOPI[i] = GMOPI[i] + document[i][2][j];
-                        break;
-                    case 'CSTPIP':
-                        CSTPIP[i] = CSTPIP[i] + document[i][2][j];
-                        break;
-                    case 'GSMCCIT':
-                        GSMCCIT[i] = GSMCCIT[i] + document[i][2][j];
-                        break;
-                    case 'GSSLT':
-                        GSSLT[i] = GSSLT[i] + document[i][2][j];
-                        break;
+        else if (endDate - startDate >= 0) {
+            var document = [];
+            var manyExercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
+            // This is the number of months being retreive.
+            var manyExerciseLength = manyExercise.length;
+            if (manyExerciseLength === 0){
+                return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
+            }
+            manyExercise.forEach((element, i) => {
+                document[i] = Object.values(element._doc);
+            });
+            // The first item is month, second it's the column inside the Excel file and third is the row.
+            for (var i = 0; i<=manyExerciseLength-1; i++){
+                AA[i] = 0;
+                CGDUOS[i] = 0;
+                CSTPIP[i] = 0;
+                GMDE[i] = 0;
+                GMGE[i] = 0;
+                GMM[i] = 0;
+                GMOPI[i] = 0;
+                CSTPIP[i] = 0;
+                GSMCCIT[i] = 0;
+                GSSLT[i] = 0;
+                var rowLength = document[i][0].length;
+                for (var j = 0; j<=rowLength-1; j++){
+                    switch (document[i][0][j]) {
+                        case 'AA':
+                            AA[i] = AA[i] + document[i][2][j];
+                            break;
+                        case 'CGDUOS':
+                            CGDUOS[i] = CGDUOS[i] + document[i][2][j];
+                            break;
+                        case 'GMDE':
+                            GMDE[i] = GMDE[i] + document[i][2][j];
+                            break;
+                        case 'GMGE':
+                            GMGE[i] = GMGE[i] + document[i][2][j];
+                            break;
+                        case 'GMM':
+                            GMM[i] = GMM[i] + document[i][2][j];
+                            break;
+                        case 'GMOPI':
+                            GMOPI[i] = GMOPI[i] + document[i][2][j];
+                            break;
+                        case 'CSTPIP':
+                            CSTPIP[i] = CSTPIP[i] + document[i][2][j];
+                            break;
+                        case 'GSMCCIT':
+                            GSMCCIT[i] = GSMCCIT[i] + document[i][2][j];
+                            break;
+                        case 'GSSLT':
+                            GSSLT[i] = GSSLT[i] + document[i][2][j];
+                            break;
+                    }
                 }
             }
+            res.status(200).json({
+                status: 'Success',
+                data: {
+                    SPRN: {
+                        AA,
+                        CGDUOS,
+                        GMDE,
+                        GMGE,
+                        GMM,
+                        GMOPI
+                    },
+                    SASEP: {
+                        CSTPIP,
+                        GSMCCIT,
+                        GSSLT
+                    }
+                }
+            });
+
+        }}
+    catch (err) {
+        next(err);
+    }
+};
+
+exports.getDetailView = async (req, res, next) => {
+    var GM = req.params.GM;
+    try {
+        var detailExercise = await exercisedBudget.find({ gm: GM});
+        if (detailExercise.length === 0) {
+            return next(new AppError(404, 'Not found', 'No data found'));
         }
         res.status(200).json({
             status: 'Success',
             data: {
-                SPRN: {
-                    AA,
-                    CGDUOS,
-                    GMDE,
-                    GMGE,
-                    GMM,
-                    GMOPI
-                },
-                SASEP: {
-                    CSTPIP,
-                    GSMCCIT,
-                    GSSLT
-                }
+                exercise: detailExercise
             }
         });
-
+    }
+    catch (err){
+        next(err);
     }
 };

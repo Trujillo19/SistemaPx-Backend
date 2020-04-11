@@ -9,6 +9,7 @@ const authController = require('../Controllers/authController');
 router.use(authController.protect);
 router.post('/exercised', upload.single('file'), exercisedBudgetController.createExercised);
 router.get('/exercised', exercisedBudgetController.getExercised);
+router.get('/exercised/:GM', exercisedBudgetController.getDetailView);
 
 
 module.exports = router;
