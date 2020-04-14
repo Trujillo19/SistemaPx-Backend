@@ -268,8 +268,8 @@ function sort(fila, cg, pf, pp, ct, imp) {
         if (clasificadorResp13 === 'CSTPIP' || clasificadorResp13 === 'GSMCCIT' || clasificadorResp13 === 'GSSLT'){
             subdireccion = 'SASEP';
         }
-        else {
-            subdireccion = '';
+        else if (clasificadorResp13 === 'GMSSTPA') {
+            subdireccion = 'SSSTPA';
         }
     }
     fila.unshift(importepositivo);

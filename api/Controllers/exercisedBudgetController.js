@@ -46,8 +46,9 @@ exports.createExercised = async (req, res, next) => {
     try {
         // Quick exit. If a file or parameters isn't present, send a Bad Request.
         if (!req.file || !req.body.inputDate) {
-            return next(new AppError(400, 'Bad Request', 'File or parameters aren\'t present'));
+            return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
         }
+        console.log(req.file.path);
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(req.file.path)
         .then(async () => {
@@ -125,7 +126,7 @@ exports.createExercised = async (req, res, next) => {
             }
             else {
                 // I'm not sure if this async functions will cause trubble latter, for now it works.
-                var deleted = await exercisedBudget.deleteOne({exerciseDate: inputDate});
+                await exercisedBudget.deleteOne({exerciseDate: inputDate});
                 var exerciseMany = await ExercisedBudget.create({createdBy: req.user, createdAt: Date.now(), exerciseDate: inputDate, gm: GM_clasificado, subdireccion: Subdireccion_clasificado,
                     importe: Importe_clasificado, ledger: Ledger_clasificado, entidadCp: EntidadCp_clasificado, ano: ano_clasificado,
                     tipodeVa: tipoDeVa_clasificado, elementoPep: elemetoPep_clasificado, fondo: fondo_clasificado, centroGestor: centroGestor_clasificado,
@@ -190,6 +191,7 @@ exports.getExercised = async (req, res, next) => {
     var CSTPIP = [];
     var GSMCCIT = [];
     var GSSLT = [];
+    var GMSSTPA = [];
     const startDate = new Date(req.query.start);
     const endDate = new Date(req.query.end);
     try {
@@ -219,6 +221,7 @@ exports.getExercised = async (req, res, next) => {
                 CSTPIP[i] = 0;
                 GSMCCIT[i] = 0;
                 GSSLT[i] = 0;
+                GMSSTPA[i] = 0;
                 var rowLength = document[i][0].length;
                 for (var j = 0; j<=rowLength-1; j++){
                     switch (document[i][0][j]) {
@@ -249,6 +252,9 @@ exports.getExercised = async (req, res, next) => {
                         case 'GSSLT':
                             GSSLT[i] = GSSLT[i] + document[i][2][j];
                             break;
+                        case 'GMSSTPA':
+                            GMSSTPA[i] = GSSLT[i] + document[i][2][j];
+                            break;
                     }
                 }
             }
@@ -267,6 +273,9 @@ exports.getExercised = async (req, res, next) => {
                         CSTPIP,
                         GSMCCIT,
                         GSSLT
+                    },
+                    SSSTPA: {
+                        GMSSTPA
                     }
                 }
             });
