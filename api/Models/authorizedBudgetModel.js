@@ -319,6 +319,10 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: [String],
         required:true
     },
+    actividad: {
+        type: [String],
+        required:true
+    },
     contrato9D: {
         type: [String],
         required:true
@@ -351,7 +355,7 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: [String],
         required:true
     },
-    estatusAresAnuencias: {
+    estadoAresAnuencias: {
         type: [String],
         required:true
     },
@@ -412,6 +416,10 @@ const authorizedBudgetModel = new mongoose.Schema({
         required:true
     },
     descAsignacion: {
+        type: [String],
+        required:true
+    },
+    saldoAsignacion: {
         type: [String],
         required:true
     },

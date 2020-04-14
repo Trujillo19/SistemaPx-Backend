@@ -78,6 +78,7 @@ var progAhorro = [];
 var anticipos = [];
 var gpoObra = [];
 var tipodeProduccion = [];
+var actividad = [];
 var contrato9D = [];
 var supervisor = [];
 var politicaPago = [];
@@ -102,6 +103,7 @@ var proyectoCartera = [];
 var montoCartera = [];
 var vigenciaCartera = [];
 var descAsignacion =[];
+var saldoAsignacion = [];
 var numMsjSistema = [];
 var mensajedeSistema = [];
 var nombreVerisonAdec = [];
@@ -109,22 +111,17 @@ var nombreVerisonAdec = [];
 exports.createAuthorized = async (req, res, next) => {
     var inputRow = [];
     const authorizedName = req.body.authorizedName;
-    console.log(authorizedName);
     try {
-        console.log('Entre aquí');
         if (!req.file || !req.body.authorizedName){
             return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
         }
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(req.file.path)
         .then(async () => {
-            Console.log('Aqui ya no');
-            var worksheet = worbook.getWorksheet('Base');
+            var worksheet = workbook.getWorksheet('Hoja1');
             worksheet.eachRow((row, rowNumber) => {
-                console.log('Menos acá');
                 if(rowNumber !== 1){
                     row.eachCell((cell, colNumber) => {
-                        console.log(cell.value);
                         inputRow.push(cell.value);
                     });
                     subdireccion.push(inputRow[0]);
@@ -203,33 +200,35 @@ exports.createAuthorized = async (req, res, next) => {
                     anticipos.push(inputRow[73]);
                     gpoObra.push(inputRow[74]);
                     tipodeProduccion.push(inputRow[75]);
-                    contrato9D.push(inputRow[76]);
-                    supervisor.push(inputRow[77]);
-                    politicaPago.push(inputRow[78]);
-                    descContrato.push(inputRow[79]);
-                    vigencia.push(inputRow[80]);
-                    compania.push(inputRow[81]);
-                    saldoContratado.push(inputRow[82]);
-                    tramiteAresAnuencias.push(inputRow[83]);
-                    estadoAresAnuencias.push(inputRow[84]);
-                    tipodeActividad.push(inputRow[85]);
-                    pozo.push(inputRow[86]);
-                    equipodePerforacion.push(inputRow[87]);
-                    embarcacion.push(inputRow[88]);
-                    costoEquipo.push(inputRow[89]);
-                    costoIntervencion.push(inputRow[90]);
-                    fechaInicialPozo.push(inputRow[91]);
-                    fechaFinalPozo.push(inputRow[92]);
-                    eFinPozo.push(inputRow[93]);
-                    costoEmbarcacion.push(inputRow[94]);
-                    cveUidepProy.push(inputRow[95]);
-                    proyectoCartera.push(inputRow[96]);
-                    montoCartera.push(inputRow[97]);
-                    vigenciaCartera.push(inputRow[98]);
-                    descAsignacion.push(inputRow[99]);
-                    numMsjSistema.push(inputRow[100]);
-                    mensajedeSistema.push(inputRow[101]);
-                    nombreVerisonAdec.push(inputRow[102]);
+                    actividad.push(inputRow[76]);
+                    contrato9D.push(inputRow[77]);
+                    supervisor.push(inputRow[78]);
+                    politicaPago.push(inputRow[79]);
+                    descContrato.push(inputRow[80]);
+                    vigencia.push(inputRow[81]);
+                    compania.push(inputRow[82]);
+                    saldoContratado.push(inputRow[83]);
+                    tramiteAresAnuencias.push(inputRow[84]);
+                    estadoAresAnuencias.push(inputRow[85]);
+                    tipodeActividad.push(inputRow[86]);
+                    pozo.push(inputRow[87]);
+                    equipodePerforacion.push(inputRow[88]);
+                    embarcacion.push(inputRow[89]);
+                    costoEquipo.push(inputRow[90]);
+                    costoIntervencion.push(inputRow[91]);
+                    fechaInicialPozo.push(inputRow[92]);
+                    fechaFinalPozo.push(inputRow[93]);
+                    eFinPozo.push(inputRow[94]);
+                    costoEmbarcacion.push(inputRow[95]);
+                    cveUidepProy.push(inputRow[96]);
+                    proyectoCartera.push(inputRow[97]);
+                    montoCartera.push(inputRow[98]);
+                    vigenciaCartera.push(inputRow[99]);
+                    descAsignacion.push(inputRow[100]);
+                    saldoAsignacion.push(inputRow[101]);
+                    numMsjSistema.push(inputRow[102]);
+                    mensajedeSistema.push(inputRow[103]);
+                    nombreVerisonAdec.push(inputRow[104]);
                 }
                 inputRow = [];
             });
@@ -243,17 +242,18 @@ exports.createAuthorized = async (req, res, next) => {
                 adefaFinal:adefaFinal, tipoPresupuesto:tipoPresupuesto, cveAsign:cveAsign, cveSipop:cveSipop, descProgPresup:descProgPresup, descElementoPep:descElementoPep, integrador:integrador,
                 subIntegrador: subIntegrador, subEjecutor:subEjecutor, ejecutor:ejecutor, rubro:rubro, clasifMo:clasifMo, irreducible:irreducible, rubroIrreducible:rubroIrreducible,
                 progAhorro: progAhorro, anticipos: anticipos, gpoObra:gpoObra,tipodeProduccion:tipodeProduccion, contrato9D:contrato9D, supervisor:supervisor, politicaPago:politicaPago, descContrato:descContrato,
-                vigencia: vigencia, compania:compania, saldoContratado:saldoContratado, tramiteAresAnuencias:tramiteAresAnuencias, estatusAresAnuencias:estatusAresAnuencias, tipodeActividad:tipodeActividad,
+                vigencia: vigencia, compania:compania, saldoContratado:saldoContratado, tramiteAresAnuencias:tramiteAresAnuencias, estatusAresAnuencias:estadoAresAnuencias, tipodeActividad:tipodeActividad,
                 pozo:pozo, equipodePerforacion:equipodePerforacion, embarcacion:embarcacion, costoEquipo:costoEquipo, costoIntervencion:costoIntervencion, fechaInicialPozo:fechaInicialPozo,
                 fechaFinalPozo: fechaFinalPozo, eFinPozo:eFinPozo, costoEmbarcacion:costoEmbarcacion, cveUidepProy:cveUidepProy, proyectoCartera:proyectoCartera, montoCartera:montoCartera,
-                vigenciaCartera:vigenciaCartera, descAsignacion:descAsignacion, numMsjSistema:numMsjSistema, mensajesdeSistema:mensajesdeSistema, nombreVersionAdec:nombreVersionAdec});
+                vigenciaCartera:vigenciaCartera, descAsignacion:descAsignacion, numMsjSistema:numMsjSistema, mensajesdeSistema:mensajedeSistema, nombreVersionAdec:nombreVerisonAdec});
             res.status(201).json({
                 status: 'Created',
                 data: {
                     authorized
                 }
             });
-        }).catch( () => {
+        }).catch( (err) => {
+            console.log(err);
             return next(new AppError(500, 'Server error', 'Something isn\'t rigth with the Excel File Reader.'));
         }).finally( () => {
             subdireccion = [];
@@ -361,6 +361,7 @@ exports.createAuthorized = async (req, res, next) => {
             nombreVerisonAdec = [];
         });
     } catch (err) {
+        console.log(err);
         next (err);
     }
 };
