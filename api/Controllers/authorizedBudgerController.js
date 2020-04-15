@@ -62,51 +62,8 @@ var fTotal = [];
 var adefaInicial = [];
 var adefaFinal = [];
 var tipoPresupuesto = [];
-var cveAsign = [];
-var cveSipop = [];
-var descProgPresup = [];
-var descElementoPep = [];
-var integrador = [];
-var subIntegrador = [];
-var subEjecutor = [];
-var ejecutor = [];
-var rubro = [];
-var clasifMo = [];
-var irreducible = [];
-var rubroIrreducible = [];
-var progAhorro = [];
-var anticipos = [];
-var gpoObra = [];
-var tipodeProduccion = [];
-var actividad = [];
-var contrato9D = [];
-var supervisor = [];
-var politicaPago = [];
-var descContrato = [];
-var vigencia = [];
-var compania = [];
-var saldoContratado = [];
-var tramiteAresAnuencias = [];
-var estadoAresAnuencias = [];
-var tipodeActividad = [];
-var pozo = [];
-var equipodePerforacion = [];
-var embarcacion = [];
-var costoEquipo = [];
-var costoIntervencion = [];
-var fechaInicialPozo = [];
-var fechaFinalPozo = [];
-var eFinPozo = [];
-var costoEmbarcacion = [];
-var cveUidepProy = [];
-var proyectoCartera = [];
-var montoCartera = [];
-var vigenciaCartera = [];
-var descAsignacion =[];
-var saldoAsignacion = [];
-var numMsjSistema = [];
-var mensajedeSistema = [];
-var nombreVerisonAdec = [];
+
+
 
 exports.createAuthorized = async (req, res, next) => {
     var inputRow = [];
@@ -184,51 +141,6 @@ exports.createAuthorized = async (req, res, next) => {
                     adefaInicial.push(inputRow[57]);
                     adefaFinal.push(inputRow[58]);
                     tipoPresupuesto.push(inputRow[59]);
-                    cveAsign.push(inputRow[60]);
-                    cveSipop.push(inputRow[61]);
-                    descProgPresup.push(inputRow[62]);
-                    descElementoPep.push(inputRow[63]);
-                    integrador.push(inputRow[64]);
-                    subIntegrador.push(inputRow[65]);
-                    subEjecutor.push(inputRow[66]);
-                    ejecutor.push(inputRow[67]);
-                    rubro.push(inputRow[68]);
-                    clasifMo.push(inputRow[69]);
-                    irreducible.push(inputRow[70]);
-                    rubroIrreducible.push(inputRow[71]);
-                    progAhorro.push(inputRow[72]);
-                    anticipos.push(inputRow[73]);
-                    gpoObra.push(inputRow[74]);
-                    tipodeProduccion.push(inputRow[75]);
-                    actividad.push(inputRow[76]);
-                    contrato9D.push(inputRow[77]);
-                    supervisor.push(inputRow[78]);
-                    politicaPago.push(inputRow[79]);
-                    descContrato.push(inputRow[80]);
-                    vigencia.push(inputRow[81]);
-                    compania.push(inputRow[82]);
-                    saldoContratado.push(inputRow[83]);
-                    tramiteAresAnuencias.push(inputRow[84]);
-                    estadoAresAnuencias.push(inputRow[85]);
-                    tipodeActividad.push(inputRow[86]);
-                    pozo.push(inputRow[87]);
-                    equipodePerforacion.push(inputRow[88]);
-                    embarcacion.push(inputRow[89]);
-                    costoEquipo.push(inputRow[90]);
-                    costoIntervencion.push(inputRow[91]);
-                    fechaInicialPozo.push(inputRow[92]);
-                    fechaFinalPozo.push(inputRow[93]);
-                    eFinPozo.push(inputRow[94]);
-                    costoEmbarcacion.push(inputRow[95]);
-                    cveUidepProy.push(inputRow[96]);
-                    proyectoCartera.push(inputRow[97]);
-                    montoCartera.push(inputRow[98]);
-                    vigenciaCartera.push(inputRow[99]);
-                    descAsignacion.push(inputRow[100]);
-                    saldoAsignacion.push(inputRow[101]);
-                    numMsjSistema.push(inputRow[102]);
-                    mensajedeSistema.push(inputRow[103]);
-                    nombreVerisonAdec.push(inputRow[104]);
                 }
                 inputRow = [];
             });
@@ -239,13 +151,7 @@ exports.createAuthorized = async (req, res, next) => {
                 nombrePozoObraEmbarcacion: nombrePozoObraEmbarcacion, asuntosRelevantes:asuntosRelevantes,elabora: elabora, dEne:dEne, dFeb:dFeb, dMar: dMar, dAbr:dAbr, dMay:dMay, dJun:dJun,  dJul:dJul,
                 dAgo: dAgo, dSep:dSep, dOct: dOct, dNov:dNov, dDic:dDic, fEne:fEne, fFeb:fFeb, fMar:fMar, fAbr:fAbr, fMay:fMay, fJun:fJun,fJul:fJul,fAgo:fAgo, fSep:fSep, fOct:fOct,  fNov:fNov, fDic:fDic,
                 fEneAsgte: fEneAsgte, fFebAsgte:fFebAsgte, fMarAsgte:fMarAsgte, fAbrAsgte:fAbrAsgte, fMayAsgte:fMayAsgte, fJunAsgte:fJunAsgte, dTotal:dTotal, fTotal:fTotal, adefaInicial:adefaInicial,
-                adefaFinal:adefaFinal, tipoPresupuesto:tipoPresupuesto, cveAsign:cveAsign, cveSipop:cveSipop, descProgPresup:descProgPresup, descElementoPep:descElementoPep, integrador:integrador,
-                subIntegrador: subIntegrador, subEjecutor:subEjecutor, ejecutor:ejecutor, rubro:rubro, clasifMo:clasifMo, irreducible:irreducible, rubroIrreducible:rubroIrreducible,
-                progAhorro: progAhorro, anticipos: anticipos, gpoObra:gpoObra,tipodeProduccion:tipodeProduccion, contrato9D:contrato9D, supervisor:supervisor, politicaPago:politicaPago, descContrato:descContrato,
-                vigencia: vigencia, compania:compania, saldoContratado:saldoContratado, tramiteAresAnuencias:tramiteAresAnuencias, estatusAresAnuencias:estadoAresAnuencias, tipodeActividad:tipodeActividad,
-                pozo:pozo, equipodePerforacion:equipodePerforacion, embarcacion:embarcacion, costoEquipo:costoEquipo, costoIntervencion:costoIntervencion, fechaInicialPozo:fechaInicialPozo,
-                fechaFinalPozo: fechaFinalPozo, eFinPozo:eFinPozo, costoEmbarcacion:costoEmbarcacion, cveUidepProy:cveUidepProy, proyectoCartera:proyectoCartera, montoCartera:montoCartera,
-                vigenciaCartera:vigenciaCartera, descAsignacion:descAsignacion, numMsjSistema:numMsjSistema, mensajesdeSistema:mensajedeSistema, nombreVersionAdec:nombreVerisonAdec});
+                adefaFinal:adefaFinal, tipoPresupuesto:tipoPresupuesto});
             res.status(201).json({
                 status: 'Created',
                 data: {
@@ -316,49 +222,6 @@ exports.createAuthorized = async (req, res, next) => {
             adefaInicial = [];
             adefaFinal = [];
             tipoPresupuesto = [];
-            cveAsign = [];
-            cveSipop = [];
-            descProgPresup = [];
-            descElementoPep = [];
-            integrador = [];
-            subIntegrador = [];
-            subEjecutor = [];
-            ejecutor = [];
-            rubro = [];
-            clasifMo = [];
-            irreducible = [];
-            rubroIrreducible = [];
-            progAhorro = [];
-            anticipos = [];
-            gpoObra = [];
-            tipodeProduccion = [];
-            contrato9D = [];
-            supervisor = [];
-            politicaPago = [];
-            descContrato = [];
-            vigencia = [];
-            compania = [];
-            saldoContratado = [];
-            tramiteAresAnuencias = [];
-            estadoAresAnuencias = [];
-            tipodeActividad = [];
-            pozo = [];
-            equipodePerforacion = [];
-            embarcacion = [];
-            costoEquipo = [];
-            costoIntervencion = [];
-            fechaInicialPozo = [];
-            fechaFinalPozo = [];
-            eFinPozo = [];
-            costoEmbarcacion = [];
-            cveUidepProy = [];
-            proyectoCartera = [];
-            montoCartera = [];
-            vigenciaCartera = [];
-            descAsignacion =[];
-            numMsjSistema = [];
-            mensajedeSistema = [];
-            nombreVerisonAdec = [];
         });
     } catch (err) {
         console.log(err);
@@ -408,34 +271,34 @@ exports.getAuthorized = async (req, res, next) => {
                 for (i=0; i<=monthDiff; i++){
                     switch (document[1][j]) {
                         case 'AA':
-                            AA[i] = AA[i] + document[25+i][j];
+                            AA[i] = AA[i] + document[25+i+startMonth][j];
                             break;
                         case 'CGDUOS':
-                            CGDUOS[i] = CGDUOS[i] + document[25+i][j];
+                            CGDUOS[i] = CGDUOS[i] + document[25+i+startMonth][j];
                             break;
                         case 'GMDE':
-                            GMDE[i] = GMDE[i] + document[25+i][j];
+                            GMDE[i] = GMDE[i] + document[25+i+startMonth][j];
                             break;
                         case 'GMGE':
-                            GMGE[i] = GMGE[i] + document[25+i][j];
+                            GMGE[i] = GMGE[i] + document[25+i+startMonth][j];
                             break;
                         case 'GMM':
-                            GMM[i] = GMM[i] + document[25+i][j];
+                            GMM[i] = GMM[i] + document[25+i+startMonth][j];
                             break;
                         case 'GMOPI':
-                            GMOPI[i] = GMOPI[i] + document[25+i][j];
+                            GMOPI[i] = GMOPI[i] + document[25+i+startMonth][j];
                             break;
                         case 'CSTPIP':
-                            CSTPIP[i] = CSTPIP[i] + document[25+i][j];
+                            CSTPIP[i] = CSTPIP[i] + document[25+i+startMonth][j];
                             break;
                         case 'GSMCCIT':
-                            GSMCCIT[i] = GSMCCIT[i] + document[25+i][j];
+                            GSMCCIT[i] = GSMCCIT[i] + document[25+i+startMonth][j];
                             break;
                         case 'GSSLT':
-                            GSSLT[i] = GSSLT[i] + document[25+i][j];
+                            GSSLT[i] = GSSLT[i] + document[25+i+startMonth][j];
                             break;
                         case 'GMSSTPA':
-                            GMSSTPA[i] = GMSSTPA[i] + document[25+i][j];
+                            GMSSTPA[i] = GMSSTPA[i] + document[25+i+startMonth][j];
                             break;
                     }
                 }
