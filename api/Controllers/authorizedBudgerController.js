@@ -367,7 +367,105 @@ exports.createAuthorized = async (req, res, next) => {
 };
 
 exports.getAuthorized = async (req, res, next) => {
+    var AA = [];
+    var CGDUOS = [];
+    var GMDE = [];
+    var GMGE = [];
+    var GMM = [];
+    var GMOPI = [];
+    var CSTPIP = [];
+    var GSMCCIT = [];
+    var GSSLT = [];
+    var GMSSTPA = [];
+    var document;
+    var name = req.query.name;
+    const endDate = new Date(req.query.endDate);
+    const startDate = new Date(req.query.startDate);
+    var startMonth = startDate.getMonth();
+    var endMonth = endDate.getMonth();
+    var monthDiff = endMonth - startMonth;
+    try {
+        if (endDate - startDate < 0 ) {
+            return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
+        }
+        else if (endDate - startDate >= 0) {
+            for (k=0; k<=monthDiff; k++){
+                AA[k] = 0;
+                CGDUOS[k] = 0;
+                GMDE[k] = 0;
+                GMGE[k] = 0;
+                GMM[k] = 0;
+                GMOPI[k] = 0;
+                CSTPIP[k] = 0;
+                GSMCCIT[k] = 0;
+                GSSLT[k] = 0;
+                GMSSTPA[k] = 0;
+            }
+            var auth = await authorizedBudget.findOne({authorizedName: name});
+            document = Object.values(auth._doc);
+            var rowLength = document[0].length;
+            for (var j = 0; j<=rowLength-1; j++){
+                for (i=0; i<=monthDiff; i++){
+                    switch (document[1][j]) {
+                        case 'AA':
+                            AA[i] = AA[i] + document[25+i][j];
+                            break;
+                        case 'CGDUOS':
+                            CGDUOS[i] = CGDUOS[i] + document[25+i][j];
+                            break;
+                        case 'GMDE':
+                            GMDE[i] = GMDE[i] + document[25+i][j];
+                            break;
+                        case 'GMGE':
+                            GMGE[i] = GMGE[i] + document[25+i][j];
+                            break;
+                        case 'GMM':
+                            GMM[i] = GMM[i] + document[25+i][j];
+                            break;
+                        case 'GMOPI':
+                            GMOPI[i] = GMOPI[i] + document[25+i][j];
+                            break;
+                        case 'CSTPIP':
+                            CSTPIP[i] = CSTPIP[i] + document[25+i][j];
+                            break;
+                        case 'GSMCCIT':
+                            GSMCCIT[i] = GSMCCIT[i] + document[25+i][j];
+                            break;
+                        case 'GSSLT':
+                            GSSLT[i] = GSSLT[i] + document[25+i][j];
+                            break;
+                        case 'GMSSTPA':
+                            GMSSTPA[i] = GMSSTPA[i] + document[25+i][j];
+                            break;
+                    }
+                }
 
-    // Add logic here
-    res.status(200).json({'ok':'ok'});
+            }
+            res.status(200).json({
+                status: 'Success',
+                data: {
+                    SPRN: {
+                        AA,
+                        CGDUOS,
+                        GMDE,
+                        GMGE,
+                        GMM,
+                        GMOPI
+                    },
+                    SASEP: {
+                        CSTPIP,
+                        GSMCCIT,
+                        GSSLT
+                    },
+                    SSSTPA: {
+                        GMSSTPA
+                    }
+                }
+            });
+        }
+
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
 };

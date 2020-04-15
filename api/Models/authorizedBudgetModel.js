@@ -248,7 +248,7 @@ const authorizedBudgetModel = new mongoose.Schema({
         required:true
     },
     adefaFinal: {
-        type: [Number],
+        type: [Array],
         required:true
     },
     tipoPresupuesto: {
@@ -340,7 +340,7 @@ const authorizedBudgetModel = new mongoose.Schema({
         required:true
     },
     vigencia: {
-        type: [Date],
+        type: [String],
         required:true
     },
     compania: {
@@ -384,11 +384,11 @@ const authorizedBudgetModel = new mongoose.Schema({
         required:true
     },
     fechaInicialPozo: {
-        type: [Date],
+        type: [String],
         required:true
     },
     fechaFinalPozo: {
-        type: [Date],
+        type: [String],
         required:true
     },
     eFinPozo: {

@@ -126,6 +126,7 @@ exports.createExercised = async (req, res, next) => {
             }
             else {
                 // I'm not sure if this async functions will cause trubble latter, for now it works.
+                // TODO: Change this to FindOneAndReplace.
                 await exercisedBudget.deleteOne({exerciseDate: inputDate});
                 var exerciseMany = await ExercisedBudget.create({createdBy: req.user, createdAt: Date.now(), exerciseDate: inputDate, gm: GM_clasificado, subdireccion: Subdireccion_clasificado,
                     importe: Importe_clasificado, ledger: Ledger_clasificado, entidadCp: EntidadCp_clasificado, ano: ano_clasificado,
@@ -213,7 +214,6 @@ exports.getExercised = async (req, res, next) => {
             for (var i = 0; i<=manyExerciseLength-1; i++){
                 AA[i] = 0;
                 CGDUOS[i] = 0;
-                CSTPIP[i] = 0;
                 GMDE[i] = 0;
                 GMGE[i] = 0;
                 GMM[i] = 0;
@@ -282,6 +282,7 @@ exports.getExercised = async (req, res, next) => {
 
         }}
     catch (err) {
+        console.log(err);
         next(err);
     }
 };
@@ -301,6 +302,7 @@ exports.getDetailView = async (req, res, next) => {
         });
     }
     catch (err){
+        console.log(err);
         next(err);
     }
 };
