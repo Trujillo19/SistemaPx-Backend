@@ -6,6 +6,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+var history = require('connect-history-api-fallback');
+
 
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
@@ -16,6 +18,7 @@ const globalErrHandler = require('./api/Controllers/errorController');
 const AppError = require('./api/Helpers/appError');
 
 const app = express();
+app.use(history());
 
 // Allow Cross-Origin request
 app.use(cors());

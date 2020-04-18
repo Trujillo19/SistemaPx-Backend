@@ -2,17 +2,17 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend sistem",
-  "main": "server.js",
+  "author": "Trujillo",
   "scripts": {
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Trujillo",
-  "license": "ISC",
+  "main": "server.js",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
+    "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "exceljs": "^3.8.2",
@@ -24,11 +24,17 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.7",
     "multer": "^1.4.2",
+    "vuetify": "^2.2.11",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
     "install": "^0.13.0",
     "nodemon": "^2.0.2",
-    "npm": "^6.14.4"
-  }
+    "npm": "^6.14.4",
+    "sass": "^1.19.0",
+    "sass-loader": "^8.0.0",
+    "vue-cli-plugin-vuetify": "~2.0.5",
+    "vuetify-loader": "^1.3.0"
+  },
+  "license": "ISC"
 }
