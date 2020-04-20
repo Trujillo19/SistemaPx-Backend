@@ -48,7 +48,6 @@ exports.createExercised = async (req, res, next) => {
         if (!req.file || !req.body.inputDate) {
             return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
         }
-        console.log(req.file.path);
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(req.file.path)
         .then(async () => {
@@ -196,6 +195,9 @@ exports.getExercised = async (req, res, next) => {
     const startDate = new Date(req.query.start);
     const endDate = new Date(req.query.end);
     try {
+        if (!req.query.start || !req.query.end) {
+            return next(new AppError(400, 'Bad Request', 'Parameters are not present'));
+        }
         if (endDate - startDate < 0 ) {
             return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
         }
@@ -305,4 +307,8 @@ exports.getDetailView = async (req, res, next) => {
         console.log(err);
         next(err);
     }
+};
+
+exports.hello = async (req, res, next) => {
+    console.log('hello');
 };

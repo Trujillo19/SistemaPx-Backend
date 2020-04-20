@@ -53,6 +53,9 @@ exports.signup = async (req, res, next) => {
         if (err.name === 'ValidationError') {
             return next(new AppError(400, 'Bad Request', err.message));
         }
+        if (err.name === 'MongoError' && err.code === 11000) {
+            return next(new AppError(400, 'Bad Request', 'Email already exist'));
+        }
         return next(err);
     }
 };

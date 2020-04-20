@@ -11,8 +11,10 @@
 //
 // Esto sólo debe hacerse cuando los datos de la hoja ProgPre20926100 dentro del
 // Clasificador GM APV 2020 cambien.
+// Actualizado al 20 de Abril 2020
 
 var arrayProgPre = {
+
     '1IAA0000BT6N2600':'AESL'  ,
     '1IAA0000KG4N260F':'AESL'  ,
     '1IAC0000PF270500':'CMCIT SV'  ,

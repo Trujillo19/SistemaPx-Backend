@@ -11,7 +11,4 @@ router.post('/signup', authController.signup);
 router.use(authController.protect);
 router.get('/:id', userController.userDetail);
 
-
-
-
 module.exports = router;

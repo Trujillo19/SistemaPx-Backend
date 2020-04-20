@@ -1,8 +1,8 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Backend sistem",
-  "author": "Trujillo",
+  "description": "Backend system",
+  "author": "Angel Trujillo",
   "scripts": {
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -12,6 +12,7 @@
 //
 // Esto sólo debe hacerse cuando los datos de la hoja Coord Activo dentro del
 // Clasificador GM APV 2020 cambien.
+// Actualizado al 20 de Abril 2020
 
 var arrayCoordActivoGH = {
     '23610200':'CGDUOS'  ,
