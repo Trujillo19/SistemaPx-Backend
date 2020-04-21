@@ -4,10 +4,10 @@ var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 const exercisedBudgetController = require('../Controllers/exercisedBudgetController');
 const authorizedBudgerController = require('../Controllers/authorizedBudgerController');
-// const authController = require('../Controllers/authController');
+const authController = require('../Controllers/authController');
 
 // All the routes in Budget are protected.
-// router.use(authController.protect);
+router.use(authController.protect);
 
 // Exercised Routes
 router.post('/exercised', upload.single('file'), exercisedBudgetController.createExercised);

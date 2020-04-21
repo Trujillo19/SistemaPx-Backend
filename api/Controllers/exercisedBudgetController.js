@@ -40,7 +40,8 @@ exports.createExercised = async (req, res, next) => {
     const colContrato = 14;
     const colImporte = 23;
     var inputRow = [];
-    const inputDate = new Date(req.body.inputDate);
+    var inputDate = new Date(req.body.inputDate);
+    var sheetName = req.body.sheetName;
     var inputYear = inputDate.getFullYear();
     var inputMonth = inputDate.getMonth()+1;
     try {
@@ -51,7 +52,7 @@ exports.createExercised = async (req, res, next) => {
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(req.file.path)
         .then(async () => {
-            var worksheet = workbook.getWorksheet('Hoja1');
+            var worksheet = workbook.getWorksheet(sheetName);
             worksheet.eachRow((row,rowNumber) => {
                 if (rowNumber !== 1){
                     row.eachCell((cell, colNumber) => {
@@ -142,8 +143,8 @@ exports.createExercised = async (req, res, next) => {
                     }
                 });
             }
-        }).catch(() => {
-            return next(new AppError(500, 'Server error', 'Something isn\'t rigth with the Excel File Reader.'));
+        }).catch((err) => {
+            return next(new AppError(500, 'Server error', err.message));
         }).finally(() =>{
             GM_clasificado = [];
             Subdireccion_clasificado = [];

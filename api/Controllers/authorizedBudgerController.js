@@ -68,6 +68,7 @@ var tipoPresupuesto = [];
 exports.createAuthorized = async (req, res, next) => {
     var inputRow = [];
     const authorizedName = req.body.authorizedName;
+    var sheetName = req.body.sheetName;
     try {
         if (!req.file || !req.body.authorizedName){
             return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
@@ -75,7 +76,7 @@ exports.createAuthorized = async (req, res, next) => {
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(req.file.path)
         .then(async () => {
-            var worksheet = workbook.getWorksheet('Hoja1');
+            var worksheet = workbook.getWorksheet(sheetName);
             worksheet.eachRow((row, rowNumber) => {
                 if(rowNumber !== 1){
                     row.eachCell((cell, colNumber) => {
