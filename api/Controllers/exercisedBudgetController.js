@@ -195,8 +195,6 @@ exports.getExercised = async (req, res, next) => {
     var GMSSTPA = [];
     const startDate = new Date(req.query.start+ 'GMT-0600');
     const endDate = new Date(req.query.end+ 'GMT-0600');
-    console.log('startDate: '+startDate);
-    console.log('EndDate: '+endDate);
     try {
         if (!req.query.start || !req.query.end) {
             return next(new AppError(400, 'Bad Request', 'Parameters are not present'));

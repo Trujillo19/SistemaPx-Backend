@@ -247,10 +247,6 @@ exports.getAuthorized = async (req, res, next) => {
     const startDate = new Date(req.query.startDate+ 'GMT-0600');
     var startMonth = startDate.getMonth()+1;
     var endMonth = endDate.getMonth()+1;
-    console.log('startDate: '+startDate);
-    console.log('EndDate: '+endDate);
-    console.log('StartMont: '+startMonth);
-    console.log('EndMont: '+endMonth);
     var monthDiff = endMonth - startMonth;
     try {
         if (endDate - startDate < 0 ) {
