@@ -17,16 +17,16 @@ var reservaPptal = [];
 var pedido = [];
 var solPed = [];
 var solicitudContratacion = [];
-var folioRaf = [];
-var folioAres = [];
-var enTecho = [];
-var descdeActividad = [];
-var nuevoRequerimiento = [];
-var instalacion = [];
-var idSeguimiento = [];
-var nombrePozoObraEmbarcacion = [];
-var asuntosRelevantes = [];
-var elabora = [];
+// var folioRaf = [];
+// var folioAres = [];
+// var enTecho = [];
+// var descdeActividad = [];
+// var nuevoRequerimiento = [];
+// var instalacion = [];
+// var idSeguimiento = [];
+// var nombrePozoObraEmbarcacion = [];
+// var asuntosRelevantes = [];
+// var elabora = [];
 var dEne = [];
 var dFeb = [];
 var dMar = [];
@@ -97,16 +97,16 @@ exports.createAuthorized = async (req, res, next) => {
                     pedido.push(inputRow[12]);
                     solPed.push(inputRow[13]);
                     solicitudContratacion.push(inputRow[14]);
-                    folioRaf.push(inputRow[15]);
-                    folioAres.push(inputRow[16]);
-                    enTecho.push(inputRow[17]);
-                    descdeActividad.push(inputRow[18]);
-                    nuevoRequerimiento.push(inputRow[19]);
-                    instalacion.push(inputRow[20]);
-                    idSeguimiento.push(inputRow[21]);
-                    nombrePozoObraEmbarcacion.push(inputRow[22]);
-                    asuntosRelevantes.push(inputRow[23]);
-                    elabora.push(inputRow[24]);
+                    // folioRaf.push(inputRow[15]);
+                    // folioAres.push(inputRow[16]);
+                    // enTecho.push(inputRow[17]);
+                    // descdeActividad.push(inputRow[18]);
+                    // nuevoRequerimiento.push(inputRow[19]);
+                    // instalacion.push(inputRow[20]);
+                    // idSeguimiento.push(inputRow[21]);
+                    // nombrePozoObraEmbarcacion.push(inputRow[22]);
+                    // asuntosRelevantes.push(inputRow[23]);
+                    // elabora.push(inputRow[24]);
                     dEne.push(inputRow[25]);
                     dFeb.push(inputRow[26]);
                     dMar.push(inputRow[27]);
@@ -147,9 +147,7 @@ exports.createAuthorized = async (req, res, next) => {
             });
             var authorized = await authorizedBudget.create({createdBy: req.user, createdAt: Date.now(), authorizedName: authorizedName, subdireccion: subdireccion,  gm: gm,
                 idProyD: idProyD, concepto: concepto, centroGestor: centroGestor, fondo: fondo, programaPresupuestal: programaPresupuestal, ePep6Nivel: ePep6Nivel, posicionFinanciera: posicionFinanciera,
-                moneda: moneda, contrato: contrato, reservaPptal: reservaPptal,  pedido: pedido, solPed: solPed, solicitudContratacion: solicitudContratacion, folioRaf: folioRaf, folioAres: folioAres,
-                enTecho: enTecho, descdeActividad: descdeActividad, nuevoRequerimiento: nuevoRequerimiento, instalacion: instalacion, idSeguimiento: idSeguimiento,
-                nombrePozoObraEmbarcacion: nombrePozoObraEmbarcacion, asuntosRelevantes:asuntosRelevantes,elabora: elabora, dEne:dEne, dFeb:dFeb, dMar: dMar, dAbr:dAbr, dMay:dMay, dJun:dJun,  dJul:dJul,
+                moneda: moneda, contrato: contrato, reservaPptal: reservaPptal,  pedido: pedido, solPed: solPed, solicitudContratacion: solicitudContratacion, dEne:dEne, dFeb:dFeb, dMar: dMar, dAbr:dAbr, dMay:dMay, dJun:dJun,  dJul:dJul,
                 dAgo: dAgo, dSep:dSep, dOct: dOct, dNov:dNov, dDic:dDic, fEne:fEne, fFeb:fFeb, fMar:fMar, fAbr:fAbr, fMay:fMay, fJun:fJun,fJul:fJul,fAgo:fAgo, fSep:fSep, fOct:fOct,  fNov:fNov, fDic:fDic,
                 fEneAsgte: fEneAsgte, fFebAsgte:fFebAsgte, fMarAsgte:fMarAsgte, fAbrAsgte:fAbrAsgte, fMayAsgte:fMayAsgte, fJunAsgte:fJunAsgte, dTotal:dTotal, fTotal:fTotal, adefaInicial:adefaInicial,
                 adefaFinal:adefaFinal, tipoPresupuesto:tipoPresupuesto});
@@ -178,16 +176,16 @@ exports.createAuthorized = async (req, res, next) => {
             pedido = [];
             solPed = [];
             solicitudContratacion = [];
-            folioRaf = [];
-            folioAres = [];
-            enTecho = [];
-            descdeActividad = [];
-            nuevoRequerimiento = [];
-            instalacion = [];
-            idSeguimiento = [];
-            nombrePozoObraEmbarcacion = [];
-            asuntosRelevantes = [];
-            elabora = [];
+            // folioRaf = [];
+            // folioAres = [];
+            // enTecho = [];
+            // descdeActividad = [];
+            // nuevoRequerimiento = [];
+            // instalacion = [];
+            // idSeguimiento = [];
+            // nombrePozoObraEmbarcacion = [];
+            // asuntosRelevantes = [];
+            // elabora = [];
             dEne = [];
             dFeb = [];
             dMar = [];

@@ -40,7 +40,7 @@ exports.createExercised = async (req, res, next) => {
     const colContrato = 14;
     const colImporte = 23;
     var inputRow = [];
-    var inputDate = new Date(req.body.inputDate);
+    var inputDate = new Date(req.body.inputDate+ 'GMT-0600');
     var sheetName = req.body.sheetName;
     var inputYear = inputDate.getFullYear();
     var inputMonth = inputDate.getMonth()+1;
