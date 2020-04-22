@@ -23,10 +23,6 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: [String],
         required:true
     },
-    idProyD: {
-        type: [String],
-        required:true
-    },
     concepto: {
         type: [String],
         required:true
@@ -43,23 +39,11 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: [String],
         required:true
     },
-    ePep6Nivel: {
-        type: [String],
-        required:true
-    },
     posicionFinanciera: {
         type: [String],
         required:true
     },
-    moneda: {
-        type: [String],
-        required:true
-    },
     contrato: {
-        type: [String],
-        required:true
-    },
-    reservaPptal: {
         type: [String],
         required:true
     },
