@@ -193,8 +193,10 @@ exports.getExercised = async (req, res, next) => {
     var GSMCCIT = [];
     var GSSLT = [];
     var GMSSTPA = [];
-    const startDate = new Date(req.query.start);
-    const endDate = new Date(req.query.end);
+    const startDate = new Date(req.query.start+ 'GMT-0600');
+    const endDate = new Date(req.query.end+ 'GMT-0600');
+    console.log('startDate: '+startDate);
+    console.log('EndDate: '+endDate);
     try {
         if (!req.query.start || !req.query.end) {
             return next(new AppError(400, 'Bad Request', 'Parameters are not present'));
@@ -261,24 +263,44 @@ exports.getExercised = async (req, res, next) => {
                     }
                 }
             }
+            var AATotal = AA.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var CGDOSTotal = CGDUOS.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GMDETotal = GMDE.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GMGETotal = GMGE.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GMMTotal = GMM.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GMOPITotal = GMOPI.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var CSTPIPTotal = CSTPIP.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GSMCCITTotal = GSMCCIT.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GSSLTTotal = GSSLT.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
+            var GMSSTPATotal = GMSSTPA.reduce((valorAnterior, valorActual, indice, vector) => {
+                return valorAnterior + valorActual; });
             res.status(200).json({
                 status: 'Success',
                 data: {
                     SPRN: {
-                        AA,
-                        CGDUOS,
-                        GMDE,
-                        GMGE,
-                        GMM,
-                        GMOPI
+                        'AA':AATotal,
+                        'CGDUOS':CGDOSTotal,
+                        'GMDE':GMDETotal,
+                        'GMGE':GMGETotal,
+                        'GMM':GMMTotal,
+                        'GMOPI':GMOPITotal
                     },
                     SASEP: {
-                        CSTPIP,
-                        GSMCCIT,
-                        GSSLT
+                        'CSTPIP':CSTPIPTotal,
+                        'GSMCCIT':GSMCCITTotal,
+                        'GSSLT':GSSLTTotal
                     },
                     SSSTPA: {
-                        GMSSTPA
+                        'GMSSTPA':GMSSTPATotal
                     }
                 }
             });
