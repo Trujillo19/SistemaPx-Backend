@@ -67,14 +67,6 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: [String],
         required:true
     },
-    solPed: {
-        type: [String],
-        required:true
-    },
-    solicitudContratacion: {
-        type: [String],
-        required:true
-    },
     dEne: {
         type: [Number],
         required:true
