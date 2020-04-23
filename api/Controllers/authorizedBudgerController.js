@@ -222,34 +222,34 @@ exports.getAuthorized = async (req, res, next) => {
                 for (i=0; i<=monthDiff; i++){
                     switch (document[1][j]) {
                         case 'AA':
-                            AA[i] = AA[i] + document[25+i+startMonth][j];
+                            AA[i] = AA[i] + document[8+i+startMonth][j];
                             break;
                         case 'CGDUOS':
-                            CGDUOS[i] = CGDUOS[i] + document[25+i+startMonth][j];
+                            CGDUOS[i] = CGDUOS[i] + document[8+i+startMonth][j];
                             break;
                         case 'GMDE':
-                            GMDE[i] = GMDE[i] + document[25+i+startMonth][j];
+                            GMDE[i] = GMDE[i] + document[8+i+startMonth][j];
                             break;
                         case 'GMGE':
-                            GMGE[i] = GMGE[i] + document[25+i+startMonth][j];
+                            GMGE[i] = GMGE[i] + document[8+i+startMonth][j];
                             break;
                         case 'GMM':
-                            GMM[i] = GMM[i] + document[25+i+startMonth][j];
+                            GMM[i] = GMM[i] + document[8+i+startMonth][j];
                             break;
                         case 'GMOPI':
-                            GMOPI[i] = GMOPI[i] + document[25+i+startMonth][j];
+                            GMOPI[i] = GMOPI[i] + document[8+i+startMonth][j];
                             break;
                         case 'CSTPIP':
-                            CSTPIP[i] = CSTPIP[i] + document[25+i+startMonth][j];
+                            CSTPIP[i] = CSTPIP[i] + document[8+i+startMonth][j];
                             break;
                         case 'GSMCCIT':
-                            GSMCCIT[i] = GSMCCIT[i] + document[25+i+startMonth][j];
+                            GSMCCIT[i] = GSMCCIT[i] + document[8+i+startMonth][j];
                             break;
                         case 'GSSLT':
-                            GSSLT[i] = GSSLT[i] + document[25+i+startMonth][j];
+                            GSSLT[i] = GSSLT[i] + document[8+i+startMonth][j];
                             break;
                         case 'GMSSTPA':
-                            GMSSTPA[i] = GMSSTPA[i] + document[25+i+startMonth][j];
+                            GMSSTPA[i] = GMSSTPA[i] + document[8+i+startMonth][j];
                             break;
                     }
                 }
