@@ -194,7 +194,6 @@ exports.getAll = async (req, res, next) => {
                     return valorAnterior + valorActual; });
                 var avanceAA = e_AATotal / a_AATotal;
                 var avanceCGDUOS = e_CGDOSTotal / a_CGDOSTotal;
-                var avanceGMSSTPA = e_GMSSTPATotal / a_GMSSTPATotal;
                 var avanceGMDE = e_GMDETotal / a_GMDETotal;
                 var avanceGMGE = e_GMGETotal / a_GMGETotal;
                 var avanceGMM = e_GMMTotal / a_GMMTotal;
@@ -210,7 +209,7 @@ exports.getAll = async (req, res, next) => {
                             'Subdirección':'SPRN APV',
                             'GM': 'AA',
                             'Autorizado': numeral(a_AATotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_AATotal).divide(1000000).format('0.00'),
+                            'Ejercicio': numeral(e_AATotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_AATotal - a_AATotal).divide(1000000).format('0.0'),
                             'Avance': numeral(avanceAA ? avanceAA : 0).format('0.0%')
                         },
