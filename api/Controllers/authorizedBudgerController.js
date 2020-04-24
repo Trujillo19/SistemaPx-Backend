@@ -122,7 +122,8 @@ exports.createAuthorized = async (req, res, next) => {
             res.status(201).json({
                 status: 'Created',
                 data: {
-                    authorized
+                    'createdBy': authorized.createdBy,
+                    'createdAt': authorized.createdAt
                 }
             });
         }).catch( (err) => {
