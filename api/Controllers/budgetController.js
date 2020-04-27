@@ -2,6 +2,8 @@ const authorizedBudget = require('../Models/authorizedBudgetModel');
 const exercisedBudget = require('../Models/exercisedBudgetModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('numeral');
+const Queue = require('bull');
+
 
 
 exports.getAll = async (req, res, next) => {
@@ -211,7 +213,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_AATotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_AATotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_AATotal - a_AATotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceAA ? avanceAA : 0).format('0%')
+                            'Avance': numeral(avanceAA ? avanceAA : 0).format('0%'),
+                            'Recepcionado': numeral(628514.87).format('0.0'),
+                            'EjercicioEsperado': numeral(628514.87 + e_AATotal).format('0.0'),
+                            'DesviacionEsperado': numeral((628514.87 + e_AATotal) - a_AATotal).format('0.0')
                         },
                         {
                             'Subdirección':'SPRN APV',
@@ -219,7 +224,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_CGDOSTotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_CGDOSTotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_CGDOSTotal - a_CGDOSTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceCGDUOS ? avanceCGDUOS : 0).format('0%')
+                            'Avance': numeral(avanceCGDUOS ? avanceCGDUOS : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_CGDOSTotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_CGDOSTotal) - a_CGDOSTotal).format('0.0')
                         },
                         {
                             'Subdirección':'SPRN APV',
@@ -227,7 +235,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GMDETotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GMDETotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GMDETotal - a_GMDETotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMDE ? avanceGMDE : 0).format('0%')
+                            'Avance': numeral(avanceGMDE ? avanceGMDE : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_GMDETotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GMDETotal) - a_GMDETotal).format('0.0')
                         },
                         {
                             'Subdirección':'SPRN APV',
@@ -235,7 +246,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GMGETotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GMGETotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GMGETotal - a_GMGETotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMGE ? avanceGMGE : 0).format('0%')
+                            'Avance': numeral(avanceGMGE ? avanceGMGE : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_GMGETotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GMGETotal) - a_GMGETotal).format('0.0')
                         },
                         {
                             'Subdirección':'SPRN APV',
@@ -243,7 +257,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GMMTotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GMMTotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GMMTotal - a_GMMTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMM ? avanceGMM : 0).format('0%')
+                            'Avance': numeral(avanceGMM ? avanceGMM : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_GMMTotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GMMTotal) - a_GMMTotal).format('0.0')
                         },
                         {
                             'Subdirección':'SPRN APV',
@@ -251,7 +268,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GMOPITotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GMOPITotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GMOPITotal - a_GMOPITotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMOPI ? avanceGMOPI : 0).format('0%')
+                            'Avance': numeral(avanceGMOPI ? avanceGMOPI : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_GMOPITotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GMOPITotal) - a_GMOPITotal).format('0.0')
                         },
                         {
                             'Subdirección':'SASEP',
@@ -259,7 +279,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_CSTPIPTotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_CSTPIPTotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_CSTPIPTotal - a_CSTPIPTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceCSTPIP ? avanceCSTPIP : 0).format('0%')
+                            'Avance': numeral(avanceCSTPIP ? avanceCSTPIP : 0).format('0%'),
+                            'Recepcionado': numeral(4856105.47).format('0.0'),
+                            'EjercicioEsperado': numeral(4856105.47 + e_CSTPIPTotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_CSTPIPTotal) - a_CSTPIPTotal).format('0.0')
                         },
                         {
                             'Subdirección':'SASEP',
@@ -267,7 +290,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GSMCCITTotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GSMCCITTotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GSMCCITTotal - a_GSMCCITTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGSMCCIT ? avanceGSMCCIT : 0).format('0%')
+                            'Avance': numeral(avanceGSMCCIT ? avanceGSMCCIT : 0).format('0%'),
+                            'Recepcionado': numeral(200551.76).format('0.0'),
+                            'EjercicioEsperado': numeral(200551.76 + e_GSMCCITTotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GSMCCITTotal) - a_GSMCCITTotal).format('0.0')
                         },
                         {
                             'Subdirección':'SASEP',
@@ -275,7 +301,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GSSLTTotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GSSLTTotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GSSLTTotal - a_GSSLTTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGSSLT ? avanceGSSLT : 0).format('0%')
+                            'Avance': numeral(avanceGSSLT ? avanceGSSLT : 0).format('0%'),
+                            'Recepcionado': numeral(5238334.59).format('0.0'),
+                            'EjercicioEsperado': numeral(5238334.59 + e_GSSLTTotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GSSLTTotal) - a_GSSLTTotal).format('0.0')
                         },
                         {
                             'Subdirección':'SSSTPA',
@@ -283,7 +312,10 @@ exports.getAll = async (req, res, next) => {
                             'Autorizado': numeral(a_GMSSTPATotal).divide(1000000).format('0.0'),
                             'Ejercicio': numeral(e_GMSSTPATotal).divide(1000000).format('0.0'),
                             'Desviación': numeral(e_GMSSTPATotal - a_GMSSTPATotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMSSTPA ? avanceGMSSTPA : 0).format('0%')
+                            'Avance': numeral(avanceGMSSTPA ? avanceGMSSTPA : 0).format('0%'),
+                            'Recepcionado': numeral(0).format('0.0'),
+                            'EjercicioEsperado': numeral(0 + e_GMSSTPATotal).format('0.0'),
+                            'DesviacionEsperado':  numeral((0 + e_GMSSTPATotal) - a_GMSSTPATotal).format('0.0')
                         }
                     ],
 
@@ -296,4 +328,17 @@ exports.getAll = async (req, res, next) => {
         console.log(err);
         next(err);
     }
+};
+
+
+exports.postBudget = async (req, res, next) => {
+    const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+    const workQueue = new Queue('work', REDIS_URL);
+    let job = await workQueue.add();
+    res.status(202).json({
+        status: 'Accepted',
+        data: {
+            id: job.id
+        }
+    });
 };

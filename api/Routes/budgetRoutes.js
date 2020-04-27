@@ -13,6 +13,10 @@ router.use(authController.protect);
 // All the budget
 router.get('/', budgetController.getAll);
 
+// Simplified routes
+router.post('/', upload.single('file'), budgetController.postBudget);
+
+
 // Exercised Routes
 router.post('/exercised', upload.single('file'), exercisedBudgetController.createExercised);
 router.get('/exercised', exercisedBudgetController.getExercised);
