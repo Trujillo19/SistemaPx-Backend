@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const Queue = require('bull');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -7,6 +8,8 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
 
+let REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+let workQueue = new Queue('work', REDIS_URL);
 
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
@@ -45,6 +48,27 @@ app.use(hpp());
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budget', budgetRoutes);
 app.use('/api/v1/helpers', helperRoutes);
+app.post('/job', async (req, res) => {
+    // This would be where you could pass arguments to the job
+    // Ex: workQueue.add({ url: 'https://www.heroku.com' })
+    // Docs: https://github.com/OptimalBits/bull/blob/develop/REFERENCE.md#queueadd
+    let job = await workQueue.add();
+    res.json({ id: job.id });
+});
+
+app.get('/job/:id', async (req, res) => {
+    let id = req.params.id;
+    let job = await workQueue.getJob(id);
+
+    if (job === null) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        res.json({ id, state, progress, reason });
+    }
+});
 
 // Handler for undefined routes
 
