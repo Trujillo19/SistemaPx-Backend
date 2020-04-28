@@ -56,8 +56,4 @@ app.use('*', (req,res,next) => {
 });
 app.use(globalErrHandler);
 
-workQueue.on('global:completed', (jobId, result) => {
-    console.log(`Job completed with result ${result}`);
-});
-
 module.exports = app;

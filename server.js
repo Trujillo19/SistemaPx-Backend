@@ -30,13 +30,31 @@ mongoose.connect(database, {
     console.log(error.name);
 });
 
-const port = process.env.PORT;
-app.listen(port, () => {
-    console.log(`App is running on port ${port}`);
+app.get('/job/:id', async (req, res) => {
+    let id = req.params.id;
+    let job = await workQueue.getJob(id);
+
+    if (job === null) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        res.json({ id, state, progress, reason });
+    }
+});
+
+workQueue.on('global:completed', (jobId, result) => {
+    console.log(`Job completed with result ${result}`);
 });
 
 process.on('unhandledRejection', err => {
     console.log('Uncaught Rejection. Shutting down...');
     console.log(err.name, err.message);
     process.exit(1);
+});
+
+const port = process.env.PORT;
+app.listen(port, () => {
+    console.log(`App is running on port ${port}`);
 });
