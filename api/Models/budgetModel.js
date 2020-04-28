@@ -10,6 +10,46 @@ const budgetModel = new mongoose.Schema({
     createdAt: {
         type: Date,
         required: true
+    },
+    Subdireccion: {
+        type: String,
+        required: true
+    },
+    GM: {
+        type: String,
+        required: true
+    },
+    Autorizado: {
+        type: Number,
+        required: true
+    },
+    Ejercicio: {
+        type: Number,
+        required: true
+    },
+    Desviación: {
+        type: Number,
+        required: true
+    },
+    Avance: {
+        type: Number,
+        required: true
+    },
+    Recepcionado: {
+        type: Number,
+        required: true
+    },
+    EjercicioEsperado: {
+        type: Number,
+        required: true
+    },
+    DesviacionEsperado: {
+        type: Number,
+        required: true
+    },
+    PorcentajeEsperado: {
+        type: Number,
+        required: true
     }
 
 });
