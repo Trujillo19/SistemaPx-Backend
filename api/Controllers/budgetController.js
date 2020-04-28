@@ -334,6 +334,8 @@ exports.getAll = async (req, res, next) => {
 exports.postBudget = async (req, res, next) => {
     const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
     const workQueue = new Queue('work', REDIS_URL);
+    console.log('File path es:');
+    console.log(req.file.path);
     let job = await workQueue.add({filepath: req.file.path});
     res.status(202).json({
         status: 'Accepted!',
