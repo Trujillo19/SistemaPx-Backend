@@ -35,7 +35,7 @@ function start() {
         while (progress < 100) {
             await sleep(50);
             progress += 1;
-            console.log(job.filepath);
+            console.log(job);
             job.progress(progress);
         }
 
