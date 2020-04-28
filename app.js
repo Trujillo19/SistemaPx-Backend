@@ -6,6 +6,10 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const Queue = require('bull');
+
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const workQueue = new Queue('work', REDIS_URL);
 
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
@@ -51,5 +55,9 @@ app.use('*', (req,res,next) => {
     next(err,req,res,next);
 });
 app.use(globalErrHandler);
+
+workQueue.on('global:completed', (jobId, result) => {
+    console.log(`Job completed with result ${result}`);
+});
 
 module.exports = app;
