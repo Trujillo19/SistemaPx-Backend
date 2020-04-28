@@ -7,6 +7,9 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
 
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const workQueue = new Queue('work', REDIS_URL);
+
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
 const budgetRoutes = require('./api/Routes/budgetRoutes');
