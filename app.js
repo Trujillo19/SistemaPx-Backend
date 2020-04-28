@@ -45,6 +45,21 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budget', budgetRoutes);
 app.use('/api/v1/helpers', helperRoutes);
 
+app.get('/job/:id', async (req, res) => {
+    let id = req.params.id;
+    let job = await workQueue.getJob(id);
+
+    if (job === null) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        res.json({ id, state, progress, reason });
+    }
+});
+
+
 // Handler for undefined routes
 app.use('*', (req,res,next) => {
     const err = new AppError(404,'Not Found','Undefined route.');

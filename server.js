@@ -34,19 +34,6 @@ mongoose.connect(database, {
     console.log(error.name);
 });
 
-app.get('/job/:id', async (req, res) => {
-    let id = req.params.id;
-    let job = await workQueue.getJob(id);
-
-    if (job === null) {
-        res.status(404).end();
-    } else {
-        let state = await job.getState();
-        let progress = job._progress;
-        let reason = job.failedReason;
-        res.json({ id, state, progress, reason });
-    }
-});
 
 workQueue.on('global:completed', (jobId, result) => {
     console.log(`Job completed with result ${result}`);
