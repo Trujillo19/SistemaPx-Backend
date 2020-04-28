@@ -1,8 +1,8 @@
 let throng = require('throng');
 let Queue = require('bull');
 var Excel = require('exceljs');
-const authorizedBudget = require('./Models/authorizedBudgetModel');
-const AppError = require('./Helpers/appError');
+const authorizedBudget = require('./api/Models/authorizedBudgetModel');
+const AppError = require('./api/Helpers/appError');
 
 // Connect to a local redis intance locally, and the Heroku-provided URL in production
 let REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
