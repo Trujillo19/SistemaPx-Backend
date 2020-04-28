@@ -336,7 +336,7 @@ exports.postBudget = async (req, res, next) => {
     const workQueue = new Queue('work', REDIS_URL);
     let job = await workQueue.add({filepath: req.file.path});
     res.status(202).json({
-        status: 'Accepted',
+        status: 'Accepted!',
         data: {
             id: job.id
         }
