@@ -5,6 +5,10 @@ const numeral = require('numeral');
 const Queue = require('bull');
 
 
+// Background worker
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const authQueue = new Queue('Authorized', REDIS_URL);
+
 
 exports.getAll = async (req, res, next) => {
     var e_AA = [];
@@ -331,14 +335,17 @@ exports.getAll = async (req, res, next) => {
 };
 
 
-exports.postBudget = async (req, res, next) => {
-    const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-    const workQueue = new Queue('work', REDIS_URL);
-    console.log('File path es:');
-    console.log(req.file.path);
-    let job = await workQueue.add({filepath: req.file.path});
+exports.postAuthorized = async (req, res, next) => {
+    var sheetName = req.body.sheetName;
+    var filepath = req.file.path;
+    var name = req.body.name;
+    var job;
+    if (!filepath || !name || !sheetName){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    job = await authQueue.add({filepath, sheetName, name});
     res.status(202).json({
-        status: 'Accepted!',
+        status: 'Accepted',
         data: {
             id: job.id
         }

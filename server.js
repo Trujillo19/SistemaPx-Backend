@@ -1,27 +1,18 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Queue = require('bull');
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const workQueue = new Queue('work', REDIS_URL);
-
+// Production check.
 if (process.env.NODE_ENV !== 'production'){
     dotenv.config({
         path: './config/development.env'
     });
 }
 
-
-process.on('uncaughtException', err => {
-    console.log('Uncaught Exception. Shutting down...');
-    console.log(err.name, err.message);
-    process.exit(1);
-});
-
+// Import all the routes and middleware
 const app = require('./app');
 
-const database = process.env.DB_URI;
 // Connect to the database
+const database = process.env.DB_URI;
 mongoose.connect(database, {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -34,17 +25,14 @@ mongoose.connect(database, {
     console.log(error.name);
 });
 
-
-workQueue.on('global:completed', (jobId, result) => {
-    console.log(`Job completed with result ${result}`);
-});
-
+// Global unhandled Error
 process.on('unhandledRejection', err => {
     console.log('Uncaught Rejection. Shutting down...');
     console.log(err.name, err.message);
     process.exit(1);
 });
 
+// Server lift
 const port = process.env.PORT;
 app.listen(port, () => {
     console.log(`App is running on port ${port}`);

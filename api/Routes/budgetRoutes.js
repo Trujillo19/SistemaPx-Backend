@@ -14,7 +14,7 @@ router.use(authController.protect);
 router.get('/', budgetController.getAll);
 
 // Simplified routes
-router.post('/', upload.single('file'), budgetController.postBudget);
+router.post('/', upload.single('file'), budgetController.postAuthorized);
 
 
 // Exercised Routes

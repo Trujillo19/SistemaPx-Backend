@@ -6,10 +6,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
-const Queue = require('bull');
-
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const workQueue = new Queue('work', REDIS_URL);
 
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
@@ -44,25 +40,10 @@ app.use(xss());
 // Prevent parameter pollution
 app.use(hpp());
 
-// Route uses
+// Routes
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budget', budgetRoutes);
 app.use('/api/v1/helpers', helperRoutes);
-
-app.get('/job/:id', async (req, res) => {
-    let id = req.params.id;
-    let job = await workQueue.getJob(id);
-
-    if (job === null) {
-        res.status(404).end();
-    } else {
-        let state = await job.getState();
-        let progress = job._progress;
-        let reason = job.failedReason;
-        res.json({ id, state, progress, reason });
-    }
-});
-
 
 // Handler for undefined routes
 app.use('*', (req,res,next) => {
