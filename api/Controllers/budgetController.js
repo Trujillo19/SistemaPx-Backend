@@ -337,7 +337,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.postAuthorized = async (req, res, next) => {
     var sheetName = req.body.sheetName;
-    var filepath = req.file.path;
+    var filepath = './' + req.file.path;
     var name = req.body.name;
     var job;
     if (!filepath || !name || !sheetName){
