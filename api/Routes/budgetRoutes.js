@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 var multer  = require('multer');
-
-// const exercisedBudgetController = require('../Controllers/exercisedBudgetController');
-// const authorizedBudgerController = require('../Controllers/authorizedBudgerController');
 const authController = require('../Controllers/authController');
 const budgetController = require('../Controllers/budgetController');
 
@@ -12,7 +9,7 @@ var storage = multer.diskStorage({
         cb(null, 'downloads/');
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now());
+        cb(null, file.fieldname + '-' + Date.now() + '.xlsx');
     }
 });
 var upload = multer({ storage: storage });
@@ -25,9 +22,6 @@ router.post('/authorized', upload.single('autorizado'), budgetController.postAut
 router.post('/exercised', upload.single('ejercicio'), budgetController.postExercised);
 router.get('/', budgetController.getAll);
 
-
-// For developent and debug.
-router.get('/job/:id', budgetController.getJobs);
 
 // // Exercised Routes
 // router.post('/exercised', upload.single('file'), exercisedBudgetController.createExercised);

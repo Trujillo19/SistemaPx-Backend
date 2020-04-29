@@ -2,13 +2,8 @@ const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('numeral');
-const Queue = require('bull');
-var path = require('path');
-
-// Background worker
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const authQueue = new Queue('Authorized', REDIS_URL);
-const exerQueue = new Queue('Exercised', REDIS_URL);
+const Excel = require('exceljs');
+const sorter = require('../Helpers/sortExercise');
 
 exports.getAll = async (req, res, next) => {
     var e_AA = [];
@@ -334,7 +329,6 @@ exports.getAll = async (req, res, next) => {
     }
 };
 
-
 exports.postAuthorized = async (req, res, next) => {
     if (!req.file || !req.body.sheetName || !req.body.authNumber){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
@@ -343,15 +337,109 @@ exports.postAuthorized = async (req, res, next) => {
     var filepath = './' + req.file.path;
     var user = req.user;
     var authNumber = req.body.authNumber;
-    var job;
-    job = await authQueue.add({filepath, sheetName, user, authNumber});
-    res.status(202).json({
-        status: 'Accepted',
-        data: {
-            id: job.id
-        },
-        'message': 'The job is being process. It will be update in a few minutes'
-    });
+    var AA = [];
+    var CGDUOS = [];
+    var GMDE = [];
+    var GMGE = [];
+    var GMM = [];
+    var GMOPI = [];
+    var CSTPIP = [];
+    var GSMCCIT = [];
+    var GSSLT = [];
+    var GMSSTPA = [];
+    for (k=0; k<=11; k++){
+        AA[k] = 0;
+        CGDUOS[k] = 0;
+        GMDE[k] = 0;
+        GMGE[k] = 0;
+        GMM[k] = 0;
+        GMOPI[k] = 0;
+        CSTPIP[k] = 0;
+        GSMCCIT[k] = 0;
+        GSSLT[k] = 0;
+        GMSSTPA[k] = 0;
+    }
+    try {
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(filepath)
+        .then(async () => {
+            var worksheet = workbook.getWorksheet(sheetName);
+            worksheet.eachRow((row, rowNumber) => {
+                if(rowNumber !== 1){
+                    row.eachCell((cell, colNumber) => {
+                        inputRow.push(cell.value);
+                    });
+                    switch (inputRow[1]) {
+                        case 'AA':
+                            for (i=0; i<=11; i++){
+                                AA[i] = AA[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'CGDUOS':
+                            for (i=0; i<=11; i++){
+                                CGDUOS[i] = CGDUOS[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GMDE':
+                            for (i=0; i<=11; i++){
+                                GMDE[i] = GMDE[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GMGE':
+                            for (i=0; i<=11; i++){
+                                GMGE[i] = GMGE[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GMM':
+                            for (i=0; i<=11; i++){
+                                GMM[i] = GMM[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GMOPI':
+                            for (i=0; i<=11; i++){
+                                GMOPI[i] = GMOPI[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'CSTPIP':
+                            for (i=0; i<=11; i++){
+                                CSTPIP[i] = CSTPIP[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GSMCCIT':
+                            for (i=0; i<=11; i++){
+                                GSMCCIT[i] = GSMCCIT[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GSSLT':
+                            for (i=0; i<=11; i++){
+                                GSSLT[i] = GSSLT[i] + inputRow[9+i];
+                            }
+                            break;
+                        case 'GMSSTPA':
+                            for (i=0; i<=11; i++){
+                                GMSSTPA[i] = GMSSTPA[i] + inputRow[9+i];
+                            }
+                            break;
+                    }
+                }
+                inputRow = [];
+            });
+            var autorizado = await authorizedBudget.create({createdBy: user, createdAt: Date.now(),
+                authNumber: authNumber, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
+            res.status(201).json({
+                status: 'Created',
+                data: {
+                    autorizado
+                }
+            });
+        }).catch( (err) => {
+            console.log(err);
+            return next(new AppError(500, 'Server error', err.message));
+        });
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
 };
 
 exports.postExercised = async (req, res, next) => {
@@ -362,30 +450,96 @@ exports.postExercised = async (req, res, next) => {
     var inputYear = inputDate.getFullYear();
     var inputMonth = inputDate.getMonth()+1;
     var sheetName = req.body.sheetName;
-    var filepath =  req.file.path;
-    console.log(req.file);
-    console.log(filepath);
+    var filepath =  './' + req.file.path;
     var user = req.user;
-    var job;
-    job = await exerQueue.add({filepath, sheetName, user, inputDate, inputYear, inputMonth});
-    res.status(202).json({
-        status: 'Accepted',
-        data: {
-            id: job.id
-        },
-        'message': 'The job is being process. It will be update in a few minutes'
-    });
+    var AA = 0;
+    var CGDUOS = 0;
+    var GMDE = 0;
+    var GMGE = 0;
+    var GMM = 0;
+    var GMOPI = 0;
+    var CSTPIP = 0;
+    var GSMCCIT = 0;
+    var GSSLT = 0;
+    var GMSSTPA = 0;
+    const colCentroGestor = 6;
+    const colPosicionFinanciera = 7;
+    const colPosicionPresupuestal = 8;
+    const colContrato = 14;
+    const colImporte = 23;
+    var inputRow = [];
+    try {
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(filepath)
+        .then(async () => {
+            var worksheet = workbook.getWorksheet(sheetName);
+            worksheet.eachRow((row,rowNumber) => {
+                if (rowNumber !== 1){
+                    row.eachCell((cell, colNumber) => {
+                        if (colNumber === 3) {
+                            if (Number.parseInt(cell.value,[ 10 ]) !== inputYear) {
+                                return next(new AppError(400, 'Bad Request', 'Some rows contain a year that doesn\'t match the input parameters'));
+                            }
+                        } else if (colNumber === 11) {
+                            if (Number.parseInt(cell.value,[ 10 ]) !== inputMonth) {
+                                return next(new AppError(400, 'Bad Request', 'Some rows contain a year that doesn\'t match the input parameters'));
+                            }
+                        }
+                        inputRow.push(cell.value);
+                    });
+                    var outputRow = sorter.sort(inputRow,colCentroGestor,colPosicionFinanciera,
+                        colPosicionPresupuestal,colContrato,colImporte);
+                    switch (outputRow[0]) {
+                        case 'AA':
+                            AA = AA + outputRow[2];
+                            break;
+                        case 'CGDUOS':
+                            CGDUOS = CGDUOS + outputRow[2];
+                            break;
+                        case 'GMDE':
+                            GMDE = GMDE + outputRow[2];
+                            break;
+                        case 'GMGE':
+                            GMGE = GMGE + outputRow[2];
+                            break;
+                        case 'GMM':
+                            GMM = GMM + outputRow[2];
+                            break;
+                        case 'GMOPI':
+                            GMOPI = GMOPI + outputRow[2];
+                            break;
+                        case 'CSTPIP':
+                            CSTPIP = CSTPIP + outputRow[2];
+                            break;
+                        case 'GSMCCIT':
+                            GSMCCIT = GSMCCIT + outputRow[2];
+                            break;
+                        case 'GSSLT':
+                            GSSLT = GSSLT + outputRow[2];
+                            break;
+                        case 'GMSSTPA':
+                            GMSSTPA = GMSSTPA + outputRow[2];
+                            break;
+                    }
+                }
+                inputRow = [];
+            });
+            var exercise = await exercisedBudget.create({createdBy: user, createdAt: Date.now(),
+                exerciseDate: inputDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
+            res.status(201).json({
+                status: 'Created',
+                data: {
+                    exercise
+                }
+            });
+        }).catch((err) => {
+            console.log(err);
+            return next(new AppError(500, 'Server error', err.message));
+        });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
 };
 
-exports.getJobs = async (req, res, next) => {
-    let id = req.params.id;
-    let job = await exerQueue.getJob(id);
-
-    if (job === null) {
-        res.status(404).end();
-    } else {
-        let state = await job.getState();
-        let progress = job._progress;
-        let reason = job.failedReason;
-        res.json({ id, state, progress, reason });
-    }};
