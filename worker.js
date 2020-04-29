@@ -146,7 +146,7 @@ function start() {
         console.log('Empezando trabajo');
         console.log(job.data.filepath);
         var filepath2 = path.join(__dirname, job.data.filepath);
-        console.log(job.data.filepath);
+        console.log(filepath2);
         var AA = 0;
         var CGDUOS = 0;
         var GMDE = 0;
@@ -165,7 +165,7 @@ function start() {
         var inputRow = [];
         try {
             var workbook = new Excel.Workbook();
-            workbook.xlsx.readFile(filepath2)
+            workbook.xlsx.readFile(job.data.filepath)
             .then(async () => {
                 var worksheet = workbook.getWorksheet(job.data.sheetName);
                 worksheet.eachRow((row,rowNumber) => {
