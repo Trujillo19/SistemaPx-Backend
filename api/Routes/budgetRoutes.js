@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 var multer  = require('multer');
-var upload = multer({ dest: 'uploads/' });
+var upload = multer({ dest: './uploads' });
 // const exercisedBudgetController = require('../Controllers/exercisedBudgetController');
 // const authorizedBudgerController = require('../Controllers/authorizedBudgerController');
 const authController = require('../Controllers/authController');

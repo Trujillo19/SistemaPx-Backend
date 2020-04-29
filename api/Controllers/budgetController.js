@@ -3,7 +3,7 @@ const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('numeral');
 const Queue = require('bull');
-
+var path = require('path');
 
 // Background worker
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
@@ -362,7 +362,8 @@ exports.postExercised = async (req, res, next) => {
     var inputYear = inputDate.getFullYear();
     var inputMonth = inputDate.getMonth()+1;
     var sheetName = req.body.sheetName;
-    var filepath =  req.file.path;
+    var filepath =  path.join(_dirname, req.file.path);
+    console.log(filepath);
     var user = req.user;
     var job;
     job = await exerQueue.add({filepath, sheetName, user, inputDate, inputYear, inputMonth});

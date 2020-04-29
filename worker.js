@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 var sorter = require('./api/Helpers/sortExercise');
 const authorizedBudget = require('./api/Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('./api/Models/newExerciseBudgetModel');
-var path = require('path');
 
 // Production check.
 if (process.env.NODE_ENV !== 'production'){
@@ -145,8 +144,6 @@ function start() {
     exerQueue.process(maxJobsPerWorker, async (job, done) => {
         console.log('Empezando trabajo');
         console.log(job.data.filepath);
-        var filepath2 = path.join(__dirname, job.data.filepath);
-        console.log(filepath2);
         var AA = 0;
         var CGDUOS = 0;
         var GMDE = 0;
@@ -165,7 +162,7 @@ function start() {
         var inputRow = [];
         try {
             var workbook = new Excel.Workbook();
-            workbook.xlsx.readFile(filepath2)
+            workbook.xlsx.readFile(job.data.filepath)
             .then(async () => {
                 var worksheet = workbook.getWorksheet(job.data.sheetName);
                 worksheet.eachRow((row,rowNumber) => {
