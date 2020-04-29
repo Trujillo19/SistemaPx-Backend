@@ -362,7 +362,7 @@ exports.postExercised = async (req, res, next) => {
     var inputYear = inputDate.getFullYear();
     var inputMonth = inputDate.getMonth()+1;
     var sheetName = req.body.sheetName;
-    var filepath = './' + req.file.path;
+    var filepath =  req.file.path;
     var user = req.user;
     var job;
     job = await exerQueue.add({filepath, sheetName, user, inputDate, inputYear, inputMonth});
