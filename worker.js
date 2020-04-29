@@ -165,7 +165,7 @@ function start() {
         var inputRow = [];
         try {
             var workbook = new Excel.Workbook();
-            workbook.xlsx.readFile(job.data.filepath)
+            workbook.xlsx.readFile(filepath2)
             .then(async () => {
                 var worksheet = workbook.getWorksheet(job.data.sheetName);
                 worksheet.eachRow((row,rowNumber) => {
