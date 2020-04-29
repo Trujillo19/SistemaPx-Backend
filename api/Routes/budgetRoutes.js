@@ -11,8 +11,8 @@ const budgetController = require('../Controllers/budgetController');
 router.use(authController.protect);
 
 // Simplified routes
-router.post('/authorized', upload.single('autorizado'), budgetController.postAuthorized);
-router.post('/exercised', upload.single('ejercicio'), budgetController.postExercised);
+router.post('/authorized', upload.single('file'), budgetController.postAuthorized);
+router.post('/exercised', upload.single('file'), budgetController.postExercised);
 router.get('/', budgetController.getAll);
 
 
