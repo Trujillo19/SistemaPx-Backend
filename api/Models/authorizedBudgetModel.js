@@ -11,10 +11,6 @@ const authorizedBudgetModel = new mongoose.Schema({
         type: Date,
         required: true
     },
-    authorizedName: {
-        type: String,
-        required: true
-    },
     subdireccion: {
         type: [String],
         required:true

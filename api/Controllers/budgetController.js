@@ -1,5 +1,5 @@
-const authorizedBudget = require('../Models/authorizedBudgetModel');
-const exercisedBudget = require('../Models/exercisedBudgetModel');
+const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
+const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('numeral');
 const Queue = require('bull');
@@ -8,7 +8,7 @@ const Queue = require('bull');
 // Background worker
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const authQueue = new Queue('Authorized', REDIS_URL);
-
+const exerQueue = new Queue('Exercised', REDIS_URL);
 
 exports.getAll = async (req, res, next) => {
     var e_AA = [];
@@ -336,18 +336,54 @@ exports.getAll = async (req, res, next) => {
 
 
 exports.postAuthorized = async (req, res, next) => {
-    var sheetName = req.body.sheetName;
-    var filepath = './' + req.file.path;
-    var name = req.body.name;
-    var job;
-    if (!filepath || !name || !sheetName){
+    if (!req.file || !req.body.sheetName || !req.body.authNumber){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
     }
-    job = await authQueue.add({filepath, sheetName, name});
+    var sheetName = req.body.sheetName;
+    var filepath = './' + req.file.path;
+    var user = req.user;
+    var authNumber = req.body.authNumber;
+    var job;
+    job = await authQueue.add({filepath, sheetName, user, authNumber});
     res.status(202).json({
         status: 'Accepted',
         data: {
             id: job.id
-        }
+        },
+        'message': 'The job is being process. It will be update in a few minutes'
     });
 };
+
+exports.postExercised = async (req, res, next) => {
+    if (!req.file || !req.body.sheetName || !req.body.inputDate){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var inputDate = new Date(req.body.inputDate + 'GMT-0600');
+    var inputYear = inputDate.getFullYear();
+    var inputMonth = inputDate.getMonth()+1;
+    var sheetName = req.body.sheetName;
+    var filepath = './' + req.file.path;
+    var user = req.user;
+    var job;
+    job = await exerQueue.add({filepath, sheetName, user, inputDate, inputYear, inputMonth});
+    res.status(202).json({
+        status: 'Accepted',
+        data: {
+            id: job.id
+        },
+        'message': 'The job is being process. It will be update in a few minutes'
+    });
+};
+
+exports.getJobs = async (req, res, next) => {
+    let id = req.params.id;
+    let job = await exerQueue.getJob(id);
+
+    if (job === null) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        res.json({ id, state, progress, reason });
+    }};
