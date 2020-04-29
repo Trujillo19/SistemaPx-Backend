@@ -363,6 +363,7 @@ exports.postExercised = async (req, res, next) => {
     var inputMonth = inputDate.getMonth()+1;
     var sheetName = req.body.sheetName;
     var filepath =  req.file.path;
+    console.log(req.file);
     console.log(filepath);
     var user = req.user;
     var job;
