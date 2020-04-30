@@ -1,17 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const newExercisedBudgetModel = new mongoose.Schema({
+const receivedBudgetModel = new mongoose.Schema({
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     createdAt: {
-        type: Date,
-        required: true
-    },
-    exerciseDate: {
         type: Date,
         required: true
     },
@@ -57,9 +53,9 @@ const newExercisedBudgetModel = new mongoose.Schema({
     }
 });
 
-newExercisedBudgetModel.pre('save', async (next) => {
+receivedBudgetModel.pre('save', async (next) => {
     return next();
 });
 
-const newExercisedBudget = mongoose.model('newExercisedBudget', newExercisedBudgetModel);
-module.exports = newExercisedBudget;
+const receivedBudget = mongoose.model('receivedBudget', receivedBudgetModel);
+module.exports = receivedBudget;

@@ -1,328 +1,223 @@
 const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('../Models/newExerciseBudgetModel');
+const receivedBudget = require('../Models/receivedBudgetModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('numeral');
 const Excel = require('exceljs');
 const sorter = require('../Helpers/sortExercise');
 
-exports.getAll = async (req, res, next) => {
-    var e_AA = [];
-    var e_CGDUOS = [];
-    var e_GMDE = [];
-    var e_GMGE = [];
-    var e_GMM = [];
-    var e_GMOPI = [];
-    var e_CSTPIP = [];
-    var e_GSMCCIT = [];
-    var e_GSSLT = [];
-    var e_GMSSTPA = [];
-    var a_AA = [];
-    var a_CGDUOS = [];
-    var a_GMDE = [];
-    var a_GMGE = [];
-    var a_GMM = [];
-    var a_GMOPI = [];
-    var a_CSTPIP = [];
-    var a_GSMCCIT = [];
-    var a_GSSLT = [];
-    var a_GMSSTPA = [];
+exports.getBudget = async (req, res, next) => {
+    if (!req.query.startDate || !req.query.endDate || !req.query.authNumber){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var e_AA = 0;
+    var e_CGDUOS = 0;
+    var e_GMDE = 0;
+    var e_GMGE = 0;
+    var e_GMM = 0;
+    var e_GMOPI = 0;
+    var e_CSTPIP = 0;
+    var e_GSMCCIT = 0;
+    var e_GSSLT = 0;
+    var e_GMSSTPA = 0;
+    var a_AA = 0;
+    var a_CGDUOS = 0;
+    var a_GMDE = 0;
+    var a_GMGE = 0;
+    var a_GMM = 0;
+    var a_GMOPI = 0;
+    var a_CSTPIP = 0;
+    var a_GSMCCIT = 0;
+    var a_GSSLT = 0;
+    var a_GMSSTPA = 0;
     const startDate = new Date(req.query.startDate+ 'GMT-0600');
     const endDate = new Date(req.query.endDate+ 'GMT-0600');
-    var name = req.query.name;
-    var startMonth = startDate.getMonth()+1;
-    var endMonth = endDate.getMonth()+1;
+    const authNumber = req.query.authNumber;
+    var startMonth = startDate.getMonth();
+    var endMonth = endDate.getMonth();
     var monthDiff = endMonth - startMonth;
+    if (endDate - startDate < 0 ) {
+        return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
+    }
     try {
-        if (!startDate || !endDate) {
-            return next(new AppError(400, 'Bad Request', 'Parameters are not present'));
+        var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
+        if (exercise.length === 0){
+            return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
         }
-        if (endDate - startDate < 0 ) {
-            return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
+        for (i = 0; i < exercise.length; i++) {
+            e_AA = e_AA + exercise[i].AA;
+            e_CGDUOS = e_CGDUOS+ exercise[i].CGDUOS;
+            e_GMDE = e_GMDE + exercise[i].GMDE;
+            e_GMGE = e_GMGE + exercise[i].GMGE;
+            e_GMM = e_GMM + exercise[i].GMM;
+            e_GMOPI = e_GMOPI + exercise[i].GMOPI;
+            e_CSTPIP = e_CSTPIP + exercise[i].CSTPIP;
+            e_GSMCCIT = e_GSMCCIT + exercise[i].GSMCCIT;
+            e_GSSLT = e_GSSLT + exercise[i].GSSLT;
+            e_GMSSTPA = e_GMSSTPA + exercise[i].GMSSTPA;
         }
-        else if (endDate - startDate >= 0) {
-            {
-                var document = [];
-                var manyExercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
-                // This is the number of months being retreive.
-                var manyExerciseLength = manyExercise.length;
-                if (manyExerciseLength === 0){
-                    return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
-                }
-                manyExercise.forEach((element, i) => {
-                    document[i] = Object.values(element._doc);
-                });
-                // The first item is month, second it's the column inside the Excel file and third is the row.
-                for (var i = 0; i<=manyExerciseLength-1; i++){
-                    e_AA[i] = 0;
-                    e_CGDUOS[i] = 0;
-                    e_GMDE[i] = 0;
-                    e_GMGE[i] = 0;
-                    e_GMM[i] = 0;
-                    e_GMOPI[i] = 0;
-                    e_CSTPIP[i] = 0;
-                    e_GSMCCIT[i] = 0;
-                    e_GSSLT[i] = 0;
-                    e_GMSSTPA[i] = 0;
-                    var rowLength = document[i][0].length;
-                    for (var j = 0; j<=rowLength-1; j++){
-                        switch (document[i][0][j]) {
-                            case 'AA':
-                                e_AA[i] = e_AA[i] + document[i][2][j];
-                                break;
-                            case 'CGDUOS':
-                                e_CGDUOS[i] = e_CGDUOS[i] + document[i][2][j];
-                                break;
-                            case 'GMDE':
-                                e_GMDE[i] = e_GMDE[i] + document[i][2][j];
-                                break;
-                            case 'GMGE':
-                                e_GMGE[i] = e_GMGE[i] + document[i][2][j];
-                                break;
-                            case 'GMM':
-                                e_GMM[i] = e_GMM[i] + document[i][2][j];
-                                break;
-                            case 'GMOPI':
-                                e_GMOPI[i] = e_GMOPI[i] + document[i][2][j];
-                                break;
-                            case 'CSTPIP':
-                                e_CSTPIP[i] = e_CSTPIP[i] + document[i][2][j];
-                                break;
-                            case 'GSMCCIT':
-                                e_GSMCCIT[i] = e_GSMCCIT[i] + document[i][2][j];
-                                break;
-                            case 'GSSLT':
-                                e_GSSLT[i] = e_GSSLT[i] + document[i][2][j];
-                                break;
-                            case 'GMSSTPA':
-                                e_GMSSTPA[i] = e_GSSLT[i] + document[i][2][j];
-                                break;
-                        }
-                    }
-                }
-                var e_AATotal = e_AA.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_CGDOSTotal = e_CGDUOS.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GMDETotal = e_GMDE.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GMGETotal = e_GMGE.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GMMTotal = e_GMM.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GMOPITotal = e_GMOPI.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_CSTPIPTotal = e_CSTPIP.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GSMCCITTotal = e_GSMCCIT.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GSSLTTotal = e_GSSLT.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var e_GMSSTPATotal = e_GMSSTPA.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-
-                for (k=0; k<=monthDiff; k++){
-                    a_AA[k] = 0;
-                    a_CGDUOS[k] = 0;
-                    a_GMDE[k] = 0;
-                    a_GMGE[k] = 0;
-                    a_GMM[k] = 0;
-                    a_GMOPI[k] = 0;
-                    a_CSTPIP[k] = 0;
-                    a_GSMCCIT[k] = 0;
-                    a_GSSLT[k] = 0;
-                    a_GMSSTPA[k] = 0;
-                }
-                var auth = await authorizedBudget.findOne({authorizedName: name});
-                var document2;
-                document2 = Object.values(auth._doc);
-                var rowLength2 = document2[0].length;
-                for (var j2 = 0; j2<=rowLength2-1; j2++){
-                    for (var i2=0; i2<=monthDiff; i2++){
-                        switch (document2[1][j2]) {
-                            case 'AA':
-                                a_AA[i2] = a_AA[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'CGDUOS':
-                                a_CGDUOS[i2] = a_CGDUOS[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GMDE':
-                                a_GMDE[i2] = a_GMDE[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GMGE':
-                                a_GMGE[i2] = a_GMGE[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GMM':
-                                a_GMM[i2] = a_GMM[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GMOPI':
-                                a_GMOPI[i2] = a_GMOPI[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'CSTPIP':
-                                a_CSTPIP[i2] = a_CSTPIP[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GSMCCIT':
-                                a_GSMCCIT[i2] = a_GSMCCIT[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GSSLT':
-                                a_GSSLT[i2] = a_GSSLT[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                            case 'GMSSTPA':
-                                a_GMSSTPA[i2] = GMSSTPA[i2] + document2[8+i2+startMonth][j2];
-                                break;
-                        }
-                    }
-
-                }
-                var a_AATotal = a_AA.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_CGDOSTotal = a_CGDUOS.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GMDETotal = a_GMDE.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GMGETotal = a_GMGE.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GMMTotal = a_GMM.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GMOPITotal = a_GMOPI.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_CSTPIPTotal = a_CSTPIP.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GSMCCITTotal = a_GSMCCIT.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GSSLTTotal = a_GSSLT.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var a_GMSSTPATotal = a_GMSSTPA.reduce((valorAnterior, valorActual, indice, vector) => {
-                    return valorAnterior + valorActual; });
-                var avanceAA = e_AATotal / a_AATotal;
-                var avanceCGDUOS = e_CGDOSTotal / a_CGDOSTotal;
-                var avanceGMDE = e_GMDETotal / a_GMDETotal;
-                var avanceGMGE = e_GMGETotal / a_GMGETotal;
-                var avanceGMM = e_GMMTotal / a_GMMTotal;
-                var avanceGMOPI = e_GMOPITotal / a_GMOPITotal;
-                var avanceCSTPIP = e_CSTPIPTotal / a_CSTPIPTotal;
-                var avanceGSMCCIT = e_GSMCCITTotal / a_GSMCCITTotal;
-                var avanceGSSLT = e_GSSLTTotal / a_GSSLTTotal;
-                var avanceGMSSTPA = e_GMSSTPATotal / a_GMSSTPATotal;
-                res.status(200).json({
-                    status: 'Success',
-                    data: [
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'AA',
-                            'Autorizado': numeral(a_AATotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_AATotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_AATotal - a_AATotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceAA ? avanceAA : 0).format('0%'),
-                            'Recepcionado': numeral(628514.87).format('0.0'),
-                            'EjercicioEsperado': numeral(628514.87 + e_AATotal).format('0.0'),
-                            'DesviacionEsperado': numeral((628514.87 + e_AATotal) - a_AATotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'CGDUOS',
-                            'Autorizado': numeral(a_CGDOSTotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_CGDOSTotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_CGDOSTotal - a_CGDOSTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceCGDUOS ? avanceCGDUOS : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_CGDOSTotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_CGDOSTotal) - a_CGDOSTotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'GMDE',
-                            'Autorizado': numeral(a_GMDETotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GMDETotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GMDETotal - a_GMDETotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMDE ? avanceGMDE : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_GMDETotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GMDETotal) - a_GMDETotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'GMGE',
-                            'Autorizado': numeral(a_GMGETotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GMGETotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GMGETotal - a_GMGETotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMGE ? avanceGMGE : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_GMGETotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GMGETotal) - a_GMGETotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'GMM',
-                            'Autorizado': numeral(a_GMMTotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GMMTotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GMMTotal - a_GMMTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMM ? avanceGMM : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_GMMTotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GMMTotal) - a_GMMTotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SPRN APV',
-                            'GM': 'GMOPI',
-                            'Autorizado': numeral(a_GMOPITotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GMOPITotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GMOPITotal - a_GMOPITotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMOPI ? avanceGMOPI : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_GMOPITotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GMOPITotal) - a_GMOPITotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SASEP',
-                            'GM': 'CSTPIP',
-                            'Autorizado': numeral(a_CSTPIPTotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_CSTPIPTotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_CSTPIPTotal - a_CSTPIPTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceCSTPIP ? avanceCSTPIP : 0).format('0%'),
-                            'Recepcionado': numeral(4856105.47).format('0.0'),
-                            'EjercicioEsperado': numeral(4856105.47 + e_CSTPIPTotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_CSTPIPTotal) - a_CSTPIPTotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SASEP',
-                            'GM': 'GSMCCIT',
-                            'Autorizado': numeral(a_GSMCCITTotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GSMCCITTotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GSMCCITTotal - a_GSMCCITTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGSMCCIT ? avanceGSMCCIT : 0).format('0%'),
-                            'Recepcionado': numeral(200551.76).format('0.0'),
-                            'EjercicioEsperado': numeral(200551.76 + e_GSMCCITTotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GSMCCITTotal) - a_GSMCCITTotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SASEP',
-                            'GM': 'GSSLT',
-                            'Autorizado': numeral(a_GSSLTTotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GSSLTTotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GSSLTTotal - a_GSSLTTotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGSSLT ? avanceGSSLT : 0).format('0%'),
-                            'Recepcionado': numeral(5238334.59).format('0.0'),
-                            'EjercicioEsperado': numeral(5238334.59 + e_GSSLTTotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GSSLTTotal) - a_GSSLTTotal).format('0.0')
-                        },
-                        {
-                            'Subdirección':'SSSTPA',
-                            'GM': 'GMSSTPA',
-                            'Autorizado': numeral(a_GMSSTPATotal).divide(1000000).format('0.0'),
-                            'Ejercicio': numeral(e_GMSSTPATotal).divide(1000000).format('0.0'),
-                            'Desviación': numeral(e_GMSSTPATotal - a_GMSSTPATotal).divide(1000000).format('0.0'),
-                            'Avance': numeral(avanceGMSSTPA ? avanceGMSSTPA : 0).format('0%'),
-                            'Recepcionado': numeral(0).format('0.0'),
-                            'EjercicioEsperado': numeral(0 + e_GMSSTPATotal).format('0.0'),
-                            'DesviacionEsperado':  numeral((0 + e_GMSSTPATotal) - a_GMSSTPATotal).format('0.0')
-                        }
-                    ],
-
-                });
-
-            }
+        var authorized = await authorizedBudget.findOne({authNumber});
+        for (j = 0; j <= monthDiff; j++){
+            a_AA = a_AA + authorized.AA[j];
+            a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
+            a_GMDE = a_GMDE + authorized.GMDE[j];
+            a_GMGE = a_GMGE + authorized.GMGE[j];
+            a_GMM = a_GMM + authorized.GMM[j];
+            a_GMOPI = a_GMOPI + authorized.GMOPI[j];
+            a_CSTPIP = a_CSTPIP + authorized.CSTPIP[j];
+            a_GSMCCIT = a_GSMCCIT + authorized.GSMCCIT[j];
+            a_GSSLT = a_GSSLT + authorized.GSSLT[j];
+            a_GMSSTPA = a_GMSSTPA + authorized.GMSSTPA[j];
         }
+        var received = await receivedBudget.findOne().sort({createdAt: -1});
 
+        var avanceAA = e_AA / a_AA;
+        var avanceCGDUOS = e_CGDUOS / a_CGDUOS;
+        var avanceGMDE = e_GMDE / a_GMDE;
+        var avanceGMGE = e_GMGE / a_GMGE;
+        var avanceGMM = e_GMM / a_GMM;
+        var avanceGMOPI = e_GMOPI / a_GMOPI;
+        var avanceCSTPIP = e_CSTPIP / a_CSTPIP;
+        var avanceGSMCCIT = e_GSMCCIT / a_GSMCCIT;
+        var avanceGSSLT = e_GSSLT / a_GSSLT;
+        var avanceGMSSTPA = e_GMSSTPA / a_GMSSTPA;
+        var avanceEsperadoAA = (received.AA + e_AA) / a_AA;
+        var avanceEsperadoCGDUOS = (received.CGDUOS + e_CGDUOS) / a_CGDUOS;
+        var avanceEsperadoGMDE = (received.GMDE + e_GMDE)/ a_GMDE;
+        var avanceEsperadoGMGE = (received.GMGE + e_GMGE) / a_GMGE;
+        var avanceEsperadoGMM = (received.GMM + e_GMM) / a_GMM;
+        var avanceEsperadoGMOPI = (received.GMOPI + e_GMOPI) / a_GMOPI;
+        var avanceEsperadoCSTPIP = (received.CSTPIP + e_CSTPIP) / a_CSTPIP;
+        var avanceEsperadoGSMCCIT = (received.GSMCCIT + e_GSMCCIT) / a_GSMCCIT;
+        var avanceEsperadoGSSLT = (received.GSSLT + e_GSSLT) / a_GSSLT;
+        var avanceEsperadoGMSSTPA = (received.GMSSTPA + e_GMSSTPA) / a_GMSSTPA;
+
+        res.status(200).json({
+            status: 'Success',
+            data: [
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'AA',
+                    'Autorizado': numeral(a_AA).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_AA).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_AA - a_AA).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceAA ? avanceAA : 0).format('0%'),
+                    'Recepcionado': numeral(received.AA).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.AA + e_AA).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.AA + e_AA) - a_AA).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoAA) ? avanceEsperadoAA : 0).format('0%'),
+                },
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'CGDUOS',
+                    'Autorizado': numeral(a_CGDUOS).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_CGDUOS).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_CGDUOS - a_CGDUOS).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceCGDUOS ? avanceCGDUOS : 0).format('0%'),
+                    'Recepcionado': numeral(received.CGDUOS).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.CGDUOS + e_CGDUOS).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.CGDUOS + e_CGDUOS) - a_CGDUOS).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoCGDUOS) ? avanceEsperadoCGDUOS : 0).format('0%'),
+                },
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'GMDE',
+                    'Autorizado': numeral(a_GMDE).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GMDE).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GMDE - a_GMDE).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGMDE ? avanceGMDE : 0).format('0%'),
+                    'Recepcionado': numeral(received.GMDE).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GMDE + e_GMDE).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GMDE + e_GMDE) - a_GMDE).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGMDE) ? avanceEsperadoGMDE : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'GMGE',
+                    'Autorizado': numeral(a_GMGE).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GMGE).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GMGE - a_GMGE).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGMGE ? avanceGMGE : 0).format('0%'),
+                    'Recepcionado': numeral(received.GMGE).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GMGE + e_GMGE).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GMGE + e_GMGE) - a_GMGE).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGMGE) ? avanceEsperadoGMGE : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'GMM',
+                    'Autorizado': numeral(a_GMM).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GMM).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GMM - a_GMM).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGMM ? avanceGMM : 0).format('0%'),
+                    'Recepcionado': numeral(received.GMM).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GMM + e_GMM).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GMM + e_GMM) - a_GMM).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGMM) ? avanceEsperadoGMM : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SPRN APV',
+                    'GM': 'GMOPI',
+                    'Autorizado': numeral(a_GMOPI).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GMOPI).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GMOPI - a_GMOPI).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGMOPI ? avanceGMOPI : 0).format('0%'),
+                    'Recepcionado': numeral(received.GMOPI).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GMOPI + e_GMOPI).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GMOPI + e_GMOPI) - a_GMOPI).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGMOPI) ? avanceEsperadoGMOPI : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SASEP',
+                    'GM': 'CSTPIP',
+                    'Autorizado': numeral(a_CSTPIP).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_CSTPIP).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_CSTPIP - a_CSTPIP).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceCSTPIP ? avanceCSTPIP : 0).format('0%'),
+                    'Recepcionado': numeral(received.CSTPIP).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.CSTPIP + e_CSTPIP).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.CSTPIP + e_CSTPIP) - a_CSTPIP).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoCSTPIP) ? avanceEsperadoCSTPIP : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SASEP',
+                    'GM': 'GSMCCIT',
+                    'Autorizado': numeral(a_GSMCCIT).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GSMCCIT).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GSMCCIT - a_GSMCCIT).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGSMCCIT ? avanceGSMCCIT : 0).format('0%'),
+                    'Recepcionado': numeral(received.GSMCCIT).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GSMCCIT + e_GSMCCIT).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GSMCCIT + e_GSMCCIT) - a_GSMCCIT).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGSMCCIT) ? avanceEsperadoGSMCCIT : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SASEP',
+                    'GM': 'GSSLT',
+                    'Autorizado': numeral(a_GSSLT).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GSSLT).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GSSLT - a_GSSLT).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGSSLT ? avanceGSSLT : 0).format('0%'),
+                    'Recepcionado': numeral(received.GSSLT).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GSSLT + e_GSSLT).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GSSLT + e_GSSLT) - a_GSSLT).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGSSLT) ? avanceEsperadoGSSLT : 0).format('0%')
+                },
+                {
+                    'Subdirección':'SSSTPA',
+                    'GM': 'GMSSTPA',
+                    'Autorizado': numeral(a_GMSSTPA).divide(1000000).format('0.0'),
+                    'Ejercicio': numeral(e_GMSSTPA).divide(1000000).format('0.0'),
+                    'Desviación': numeral(e_GMSSTPA - a_GMSSTPA).divide(1000000).format('0.0'),
+                    'Avance': numeral(avanceGMSSTPA ? avanceGMSSTPA : 0).format('0%'),
+                    'Recepcionado': numeral(received.GMSSTPA).divide(1000000).format('0.0'),
+                    'EjercicioEsperado': numeral(received.GMSSTPA + e_GMSSTPA).divide(1000000).format('0.0'),
+                    'DesviacionEsperado': numeral((received.GMSSTPA + e_GMSSTPA) - a_GMSSTPA).divide(1000000).format('0.0'),
+                    'AvanceEsperado': numeral(isFinite(avanceEsperadoGMSSTPA) ? avanceEsperadoGMSSTPA : 0).format('0%')
+                }
+            ],
+
+        });
     } catch (err) {
         console.log(err);
         next(err);
@@ -447,8 +342,6 @@ exports.postExercised = async (req, res, next) => {
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
     }
     var inputDate = new Date(req.body.inputDate + 'GMT-0600');
-    var inputYear = inputDate.getFullYear();
-    var inputMonth = inputDate.getMonth()+1;
     var sheetName = req.body.sheetName;
     var filepath =  './' + req.file.path;
     var user = req.user;
@@ -476,15 +369,6 @@ exports.postExercised = async (req, res, next) => {
             worksheet.eachRow((row,rowNumber) => {
                 if (rowNumber !== 1){
                     row.eachCell((cell, colNumber) => {
-                        if (colNumber === 3) {
-                            if (Number.parseInt(cell.value,[ 10 ]) !== inputYear) {
-                                return next(new AppError(400, 'Bad Request', 'Some rows contain a year that doesn\'t match the input parameters'));
-                            }
-                        } else if (colNumber === 11) {
-                            if (Number.parseInt(cell.value,[ 10 ]) !== inputMonth) {
-                                return next(new AppError(400, 'Bad Request', 'Some rows contain a year that doesn\'t match the input parameters'));
-                            }
-                        }
                         inputRow.push(cell.value);
                     });
                     var outputRow = sorter.sort(inputRow,colCentroGestor,colPosicionFinanciera,
@@ -538,8 +422,95 @@ exports.postExercised = async (req, res, next) => {
         });
     }
     catch (err) {
+        return next(err);
+    }
+};
+
+exports.postReceived = async (req, res, next) => {
+    if (!req.file || !req.body.sheetName || !req.body.receivedDate){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var sheetName = req.body.sheetName;
+    var receivedDate = req.body.receivedDate;
+    var filepath =  './' + req.file.path;
+    var user = req.user;
+    var AA = 0;
+    var CGDUOS = 0;
+    var GMDE = 0;
+    var GMGE = 0;
+    var GMM = 0;
+    var GMOPI = 0;
+    var CSTPIP = 0;
+    var GSMCCIT = 0;
+    var GSSLT = 0;
+    var GMSSTPA = 0;
+    const colCentroGestor = 8;
+    const colPosicionFinanciera = 9;
+    const colPosicionPresupuestal = 10;
+    const colContrato = 3;
+    var inputRow = [];
+    try {
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(filepath)
+        .then(async () => {
+            var worksheet = workbook.getWorksheet(sheetName);
+            worksheet.eachRow((row,rowNumber) => {
+                if (rowNumber !== 1){
+                    row.eachCell((cell, colNumber) => {
+                        inputRow.push(cell.value);
+                    });
+                    var outputRow = sorter.generalSort(inputRow,colCentroGestor,colPosicionFinanciera,
+                        colPosicionPresupuestal,colContrato);
+                    console.log(outputRow[0]);
+                    switch (outputRow[0]) {
+                        case 'AA':
+                            AA = AA + outputRow[23];
+                            break;
+                        case 'CGDUOS':
+                            CGDUOS = CGDUOS + outputRow[23];
+                            break;
+                        case 'GMDE':
+                            GMDE = GMDE + outputRow[23];
+                            break;
+                        case 'GMGE':
+                            GMGE = GMGE + outputRow[23];
+                            break;
+                        case 'GMM':
+                            GMM = GMM + outputRow[23];
+                            break;
+                        case 'GMOPI':
+                            GMOPI = GMOPI + outputRow[23];
+                            break;
+                        case 'CSTPIP':
+                            CSTPIP = CSTPIP + outputRow[23];
+                            break;
+                        case 'GSMCCIT':
+                            GSMCCIT = GSMCCIT + outputRow[23];
+                            break;
+                        case 'GSSLT':
+                            GSSLT = GSSLT + outputRow[23];
+                            break;
+                        case 'GMSSTPA':
+                            GMSSTPA = GMSSTPA + outputRow[23];
+                            break;
+                    }
+                }
+                inputRow = [];
+            });
+            var received = await receivedBudget.create({createdBy: user, createdAt: Date.now(),
+                AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
+            res.status(201).json({
+                status: 'Created',
+                data: {
+                    received
+                }
+            });
+        }).catch ((err) => {
+            console.log(err);
+            return next(new AppError(500, 'Server error', err.message));
+        });
+    } catch (err) {
         console.log(err);
         next(err);
     }
 };
-
