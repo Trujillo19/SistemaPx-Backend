@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const saltRound = 10;
 const User = require('../Models/userModel');
 const AppError = require('../Helpers/appError');
+const mailSender = require('../Helpers/mailSender');
+
 
 // Token creation function
 const createToken = id => {
@@ -36,11 +38,20 @@ exports.signup = async (req, res, next) => {
             password: hashedPassword,
             role
         });
+        console.log(email);
+        // const msg = {
+        //     to: email,
+        //     from: 'angeeltrujillo@gmail.com',
+        //     subject: 'Sending with Twilio SendGrid is Fun',
+        //     text: 'and easy to do anywhere, even with Node.js',
+        //     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+        // };
         // Token creation
         const token = createToken(user._id);
         // Delete password from the response
         user.password = undefined;
         // Send response and token
+        // mailSender.sendMessage(msg);
         return res.status(201).json({
             status: 'Success',
             token,
