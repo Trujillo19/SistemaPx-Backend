@@ -11,6 +11,10 @@ const receivedBudgetModel = new mongoose.Schema({
         type: Date,
         required: true
     },
+    receivedDate: {
+        type: Date,
+        required: true
+    },
     AA: {
         type: Number,
         required: true

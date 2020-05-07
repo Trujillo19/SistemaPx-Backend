@@ -11,8 +11,8 @@ const newAuthorizedBudgetModel = new mongoose.Schema({
         type: Date,
         required: true
     },
-    authNumber: {
-        type: Number,
+    authName: {
+        type: String,
         required: true
     },
     AA: {

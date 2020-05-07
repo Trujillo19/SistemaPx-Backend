@@ -13,7 +13,7 @@ var arrayGMTrasladadas = require('./GMTrasladadas');
 
 // Función a exportar, realiza la clasificación.
 function sort(fila, cg, pf, pp, ct, imp) {
-    var subdireccion;
+    var subdireccion = '';
     var centro_gestor = fila[cg].toString();
     var posicion_financiera = fila[pf].toString();
     var programa_presupuestal = fila[pp].toString();
@@ -37,6 +37,7 @@ function sort(fila, cg, pf, pp, ct, imp) {
     // Los dos siguientes dígitos a partir de la posición 11 de Programa Presupuestal.
     // Ejemplo:
     var campo_2 = programa_presupuestal.substr(11,2);
+    var campo_3 = campo_2.substr(0,1);
     // Concatenar centro gestor + programa presupuestal
     // Ejemplo:
     var llave = centro_gestor + programa_presupuestal;
@@ -82,10 +83,10 @@ function sort(fila, cg, pf, pp, ct, imp) {
         clasificadorResp2 = clasificadorResp1;
     }
     // Fórmula de Excel:
-    //=SI(D2=0,SI(O(S2="J1",S2="J5",S2="J6",S2="J7",S2="J8",S2="J9",S2="K4",T2="K20"),"GERENCIA",0),D2)
+    //=SI(D2=0,SI(O(S2="J1",S2="J5",S2="J6",S2="J7",S2="J8",S2="J9",S2="K4",T2="K20",EXTRAE(S2,1,1)="W"),"GERENCIA",0),D2)
     var clasificadorResp3;
     if (clasificadorResp2 === 0){
-        if (campo_2 === 'J1' || campo_2=== 'J5' ||  campo_2==='J6' ||  campo_2==='J7' ||  campo_2==='J8' ||  campo_2==='J9' ||  campo_2==='K4' || campo==='K20'){
+        if (campo_2 === 'J1' || campo_2=== 'J5' ||  campo_2==='J6' ||  campo_2==='J7' ||  campo_2==='J8' ||  campo_2==='J9' ||  campo_2==='K4' || campo==='K20' || campo_3==='W'){
             clasificadorResp3 = 'GERENCIA';
         }
         else {
@@ -238,49 +239,10 @@ function sort(fila, cg, pf, pp, ct, imp) {
     else {
         clasificadorResp11 = clasificadorResp10;
     }
-    // Aquí se realiza las GM Trasladadas
-    // Si la variable contrato existe, busca por coincidencia en GM Trasladadas
-    // Si la variable contrato no existe o no encuentra coincidencia en GM Trasladados
-    // Regresa el último estado.
-    var clasificadorResp12;
-    if (clasificadorResp11 && contrato_9){
-        if (contrato_9 in arrayGMTrasladadas){
-            clasificadorResp12 = arrayGMTrasladadas[contrato_9];
-        }
-        else {
-            clasificadorResp12 =clasificadorResp11;
-        }
-    }
-    else {
-        clasificadorResp12 = clasificadorResp11;
-    }
-    // La de GMOPI que se agrega
-    var clasificadorResp13;
-    if (clasificadorResp12==='NO ASIG' && asignacion==='J4P' && prog==='PQ'){
-        clasificadorResp13 = 'GMOPI';
-    }
-    else {
-        clasificadorResp13 = clasificadorResp12;
-    }
-
-    if ( clasificadorResp13 === 'AA' || clasificadorResp13 === 'CGDUOS' || clasificadorResp13 === 'GMDE'
-		|| clasificadorResp13 === 'GMGE' || clasificadorResp13 === 'GMM' || clasificadorResp13 === 'GMOPI'){
-        subdireccion = 'SPRN APV';
-    }
-    else {
-        if (clasificadorResp13 === 'CSTPIP' || clasificadorResp13 === 'GSMCCIT' || clasificadorResp13 === 'GSSLT'){
-            subdireccion = 'SASEP';
-        }
-        else if (clasificadorResp13 === 'GMSSTPA') {
-            subdireccion = 'SSSTPA';
-        }
-    }
     fila.unshift(importepositivo);
     fila.unshift(subdireccion);
-    fila.unshift(clasificadorResp13);
+    fila.unshift(clasificadorResp11);
     return fila;
-
-
 }
 
 function generalSort(fila, cg, pf, pp, ct) {
@@ -506,31 +468,7 @@ function generalSort(fila, cg, pf, pp, ct) {
     else {
         clasificadorResp11 = clasificadorResp10;
     }
-    // Aquí se realiza las GM Trasladadas
-    // Si la variable contrato existe, busca por coincidencia en GM Trasladadas
-    // Si la variable contrato no existe o no encuentra coincidencia en GM Trasladados
-    // Regresa el último estado.
-    var clasificadorResp12;
-    if (clasificadorResp11 && contrato_9){
-        if (contrato_9 in arrayGMTrasladadas){
-            clasificadorResp12 = arrayGMTrasladadas[contrato_9];
-        }
-        else {
-            clasificadorResp12 =clasificadorResp11;
-        }
-    }
-    else {
-        clasificadorResp12 = clasificadorResp11;
-    }
-    // La de GMOPI que se agrega
-    var clasificadorResp13;
-    if (clasificadorResp12==='NO ASIG' && asignacion==='J4P' && prog==='PQ'){
-        clasificadorResp13 = 'GMOPI';
-    }
-    else {
-        clasificadorResp13 = clasificadorResp12;
-    }
-    fila.unshift(clasificadorResp13);
+    fila.unshift(clasificadorResp11);
     return fila;
 }
 
