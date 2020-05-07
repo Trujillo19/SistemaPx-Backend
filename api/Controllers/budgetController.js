@@ -2,7 +2,7 @@ const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const receivedBudget = require('../Models/receivedBudgetModel');
 const AppError = require('../Helpers/appError');
-const numeral = require('numeral');
+const numeral = require('../Helpers/numeral');
 const Excel = require('exceljs');
 const sorter = require('../Helpers/sortExercise');
 
@@ -444,7 +444,6 @@ exports.postExercised = async (req, res, next) => {
                     });
                     var outputRow = sorter.sort(inputRow,colCentroGestor,colPosicionFinanciera,
                         colPosicionPresupuestal,colContrato,colImporte);
-                    console.log('GM Clasificado: ' + outputRow[0]);
                     switch (outputRow[0]) {
                         case 'AA':
                             AA = AA + outputRow[2];
