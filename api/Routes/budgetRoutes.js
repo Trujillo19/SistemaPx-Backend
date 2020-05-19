@@ -19,6 +19,7 @@ router.use(authController.protect);
 
 // Simplified routes
 router.get('/', budgetController.getBudget);
+router.get('/pptx', budgetController.getPresentation);
 router.post('/authorized', upload.single('autorizado'), budgetController.postAuthorized);
 router.post('/exercised', upload.single('ejercicio'), budgetController.postExercised);
 router.post('/received', upload.single('received'), budgetController.postReceived);

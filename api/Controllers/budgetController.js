@@ -1,6 +1,7 @@
 const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const receivedBudget = require('../Models/receivedBudgetModel');
+const exerciseChart = require('../Models/exerciseChartModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('../Helpers/numeral');
 const Excel = require('exceljs');
@@ -479,6 +480,10 @@ exports.postExercised = async (req, res, next) => {
                 }
                 inputRow = [];
             });
+            var today = new Date();
+            var total = AA + CGDUOS + GMDE + GMGE + GMM + GMOPI + CSTPIP + GSMCCIT + GSSLT + GMSSTPA;
+            var dia = today.getDate();
+            var exerciseTotalChart = await exerciseChart.create({createdBy: user, day:dia, exercise: total });
             var exercise = await exercisedBudget.create({createdBy: user, createdAt: Date.now(),
                 exerciseDate: inputDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
             res.status(201).json({
@@ -578,6 +583,339 @@ exports.postReceived = async (req, res, next) => {
         }).catch ((err) => {
             console.log(err);
             return next(new AppError(500, 'Server error', err.message));
+        });
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+};
+
+exports.getPresentation = async (req, res, next) => {
+    if (!req.query.startDate || !req.query.endDate || !req.query.authName){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var mesInicial;
+    var mesFinal;
+    const startDate = new Date(req.query.startDate+ 'GMT-0600');
+    const endDate = new Date(req.query.endDate+ 'GMT-0600');
+    var monthDiff = endDate.getMonth() - startDate.getMonth();
+    switch (startDate.getMonth()) {
+        case 0:
+            mesInicial = 'enero';
+            break;
+        case 1:
+            mesInicial = 'febrero';
+            break;
+        case 2:
+            mesInicial = 'marzo';
+            break;
+        case 3:
+            mesInicial = 'abril';
+            break;
+        case 4:
+            mesInicial = 'mayo';
+            break;
+        case 5:
+            mesInicial = 'junio';
+            break;
+        case 6:
+            mesInicial = 'julio';
+            break;
+        case 7:
+            mesInicial = 'agosto';
+            break;
+        case 8:
+            mesInicial = 'septiembre';
+            break;
+        case 9:
+            mesInicial = 'octubre';
+            break;
+        case 10:
+            mesInicial = 'noviembre';
+            break;
+        case 11:
+            mesInicial = 'diciembre';
+            break;
+    }
+    switch (endDate.getMonth()) {
+        case 0:
+            mesFinal = 'enero';
+            break;
+        case 1:
+            mesFinal = 'febrero';
+            break;
+        case 2:
+            mesFinal = 'marzo';
+            break;
+        case 3:
+            mesFinal = 'abril';
+            break;
+        case 4:
+            mesFinal = 'mayo';
+            break;
+        case 5:
+            mesFinal = 'junio';
+            break;
+        case 6:
+            mesFinal = 'julio';
+            break;
+        case 7:
+            mesFinal = 'agosto';
+            break;
+        case 8:
+            mesFinal = 'septiembre';
+            break;
+        case 9:
+            mesFinal = 'octubre';
+            break;
+        case 10:
+            mesFinal = 'noviembre';
+            break;
+        case 11:
+            mesFinal = 'diciembre';
+            break;
+    }
+    // New vars
+    var realChart = [];
+    var adecChart = [];
+    var realTable = [];
+    var adecTableSuma = 0;
+    var realTableSuma = 0;
+    var avance = 0;
+    var adecSumaAvance = 0;
+    var tableAA = [];
+    var tableCGDUOS = [];
+    var tableGMDE = [];
+    var tableGMGE = [];
+    var tableGMM = [];
+    var tableGMOPI = [];
+    var tableSPRN = [];
+    var tableCSTPIP = [];
+    var tableGSMCCIT = [];
+    var tableGSSLT = [];
+    var tableSASEP = [];
+    var tableGMSSTPA = [];
+    var tableSSSTPA = [];
+    var tableInversion = [];
+    var tableAARecepcionado = [];
+    var tableCGDUOSRecepcionado = [];
+    var tableGMDERecepcionado = [];
+    var tableGMGERecepcionado = [];
+    var tableGMMRecepcionado = [];
+    var tableGMOPIRecepcionado = [];
+    var tableSPRNRecepcionado = [];
+    var tableCSTPIPRecepcionado = [];
+    var tableGMCCITRecepcionado = [];
+    var tableGSSLTRecepcionado = [];
+    var tableSASEPRecepcionado = [];
+    var tableGMSSTPARecepcionado = [];
+    var tableSSSTPARecepcionado = [];
+    var tableTotalInversionRecepcionado = [];
+    var e_AA = 0;
+    var e_CGDUOS = 0;
+    var e_GMDE = 0;
+    var e_GMGE = 0;
+    var e_GMM = 0;
+    var e_GMOPI = 0;
+    var e_CSTPIP = 0;
+    var e_GSMCCIT = 0;
+    var e_GSSLT = 0;
+    var e_GMSSTPA = 0;
+    var a_AA = 0;
+    var a_CGDUOS = 0;
+    var a_GMDE = 0;
+    var a_GMGE = 0;
+    var a_GMM = 0;
+    var a_GMOPI = 0;
+    var a_CSTPIP = 0;
+    var a_GSMCCIT = 0;
+    var a_GSSLT = 0;
+    var a_GMSSTPA = 0;
+    const authName = req.query.authName;
+    if (endDate - startDate < 0 ) {
+        return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
+    }
+    try {
+        var authorized = await authorizedBudget.findOne({authName});
+        var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
+        var received = await receivedBudget.findOne().sort({receivedDate: -1});
+        var chartEjercicio = await exerciseChart.find();
+        console.log(chartEjercicio);
+        for (j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
+            a_AA = a_AA + authorized.AA[j];
+            a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
+            a_GMDE = a_GMDE + authorized.GMDE[j];
+            a_GMGE = a_GMGE + authorized.GMGE[j];
+            a_GMM = a_GMM + authorized.GMM[j];
+            a_GMOPI = a_GMOPI + authorized.GMOPI[j];
+            a_CSTPIP = a_CSTPIP + authorized.CSTPIP[j];
+            a_GSMCCIT = a_GSMCCIT + authorized.GSMCCIT[j];
+            a_GSSLT = a_GSSLT + authorized.GSSLT[j];
+            a_GMSSTPA = a_GMSSTPA + authorized.GMSSTPA[j];
+        }
+        if (exercise.length === 0){
+            return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
+        }
+        for (j = 0; j <= 11; j++){
+            adecChart[j] = authorized.AA[j] + authorized.CGDUOS[j] + authorized.GMDE[j] + authorized.GMGE[j] +
+            authorized.GMM[j] + authorized.GMOPI[j] + authorized.CSTPIP[j] + authorized.GSMCCIT[j]+ authorized.GSSLT[j] + authorized.GMSSTPA[j];
+            adecTableSuma = adecTableSuma + adecChart[j];
+            adecChart[j] = numeral(adecChart[j]).divide(1000000).format('0');
+        }
+        for (i = 0; i < exercise.length; i++) {
+            realChart[i] = exercise[i].AA + exercise[i].CGDUOS + exercise[i].GMDE + exercise[i].GMGE + exercise[i].GMM + exercise[i].GMOPI +
+            exercise[i].CSTPIP + exercise[i].GSMCCIT + exercise[i].GSSLT + exercise[i].GMSSTPA;
+            realTableSuma = realTableSuma + realChart[i];
+            realChart[i] = numeral(realChart[i]).divide(1000000).format('0');
+            realTable[i] = realChart[i];
+            adecSumaAvance = adecSumaAvance + parseInt(adecChart[i]);
+            e_AA = e_AA + exercise[i].AA;
+            e_CGDUOS = e_CGDUOS+ exercise[i].CGDUOS;
+            e_GMDE = e_GMDE + exercise[i].GMDE;
+            e_GMGE = e_GMGE + exercise[i].GMGE;
+            e_GMM = e_GMM + exercise[i].GMM;
+            e_GMOPI = e_GMOPI + exercise[i].GMOPI;
+            e_CSTPIP = e_CSTPIP + exercise[i].CSTPIP;
+            e_GSMCCIT = e_GSMCCIT + exercise[i].GSMCCIT;
+            e_GSSLT = e_GSSLT + exercise[i].GSSLT;
+            e_GMSSTPA = e_GMSSTPA + exercise[i].GMSSTPA;
+        }
+        realTableSuma =  numeral(realTableSuma).divide(1000000).format('0');
+        for (i=realTable.length; i<12; i++){
+            realTable.push('');
+        }
+        adecTableSuma =  numeral(adecTableSuma).divide(1000000).format('0');
+        avance = numeral(realTableSuma / adecSumaAvance).format('0%');
+        var avanceAA = e_AA / a_AA;
+        var avanceCGDUOS = e_CGDUOS / a_CGDUOS;
+        var avanceGMDE = e_GMDE / a_GMDE;
+        var avanceGMGE = e_GMGE / a_GMGE;
+        var avanceGMM = e_GMM / a_GMM;
+        var avanceGMOPI = e_GMOPI / a_GMOPI;
+        var avanceCSTPIP = e_CSTPIP / a_CSTPIP;
+        var avanceGSMCCIT = e_GSMCCIT / a_GSMCCIT;
+        var avanceGSSLT = e_GSSLT / a_GSSLT;
+        var avanceGMSSTPA = e_GMSSTPA / a_GMSSTPA;
+        var avanceEsperadoAA = (received.AA + e_AA) / a_AA;
+        var avanceEsperadoCGDUOS = (received.CGDUOS + e_CGDUOS) / a_CGDUOS;
+        var avanceEsperadoGMDE = (received.GMDE + e_GMDE)/ a_GMDE;
+        var avanceEsperadoGMGE = (received.GMGE + e_GMGE) / a_GMGE;
+        var avanceEsperadoGMM = (received.GMM + e_GMM) / a_GMM;
+        var avanceEsperadoGMOPI = (received.GMOPI + e_GMOPI) / a_GMOPI;
+        var avanceEsperadoCSTPIP = (received.CSTPIP + e_CSTPIP) / a_CSTPIP;
+        var avanceEsperadoGSMCCIT = (received.GSMCCIT + e_GSMCCIT) / a_GSMCCIT;
+        var avanceEsperadoGSSLT = (received.GSSLT + e_GSSLT) / a_GSSLT;
+        var avanceEsperadoGMSSTPA = (received.GMSSTPA + e_GMSSTPA) / a_GMSSTPA;
+        var a_SPRN = a_AA + a_CGDUOS + a_GMDE + a_GMGE + a_GMM + a_GMOPI;
+        var e_SPRN = e_AA + e_CGDUOS + e_GMDE + e_GMGE + e_GMM + e_GMOPI;
+        var a_SASEP = a_CSTPIP + a_GSMCCIT + a_GSSLT;
+        var e_SASEP = e_CSTPIP + e_GSMCCIT + e_GSSLT;
+        var avanceSASEP = e_SASEP / a_SASEP;
+        var avanceSPRN = e_SPRN / a_SPRN;
+        var a_SSSTPA = a_GMSSTPA;
+        var e_SSSTPA = e_GMSSTPA;
+        var avanceSSSTPA = e_SSSTPA / a_SSSTPA;
+        var a_Total = a_SPRN + a_SASEP + a_SSSTPA;
+        var e_Total = e_SPRN + e_SASEP + e_SSSTPA;
+        var avanceTotal = e_Total / a_Total;
+        var recepcionadoSPRN = received.AA + received.CGDUOS + received.GMDE + received.GMGE + received.GMM + received.GMOPI;
+        var avanceEsperadoSPRN = (recepcionadoSPRN + e_SPRN) / a_SPRN;
+        var recepcionadoSASEP = received.CSTPIP + received.GSMCCIT + received.GSSLT;
+        var avanceEsperadoSASEP = (recepcionadoSASEP + e_SASEP) / a_SASEP;
+        var recepcionadoSSSTPA = received.GMSSTPA;
+        var avanceEsperadoSSSTPA = (recepcionadoSSSTPA + e_SSSTPA) / a_SSSTPA;
+        var recepcionadoTotal = recepcionadoSPRN + recepcionadoSASEP + recepcionadoSSSTPA;
+        var avanceEsperadoTotal = (recepcionadoTotal + e_Total) / a_Total;
+        tableAA = ['SPRN', 'AA', numeral(a_AA).divide(1000000).format('0.0'), numeral(e_AA).divide(1000000).format('0.0'),  numeral(e_AA - a_AA).divide(1000000).format('0.0'), numeral(avanceAA ? avanceAA : 0).format('0%')];
+        tableCGDUOS = ['', 'CGDUOS', numeral(a_CGDUOS).divide(1000000).format('0.0'), numeral(e_CGDUOS).divide(1000000).format('0.0'),  numeral(e_CGDUOS - a_CGDUOS).divide(1000000).format('0.0'), numeral(avanceCGDUOS ? avanceCGDUOS : 0).format('0%') ];
+        tableGMDE = ['', 'GMDE', numeral(a_GMDE).divide(1000000).format('0.0'), numeral(e_GMDE).divide(1000000).format('0.0'),  numeral(e_GMDE - a_GMDE).divide(1000000).format('0.0'), numeral(avanceGMDE ? avanceGMDE : 0).format('0%') ];
+        tableGMGE = ['', 'GMGE', numeral(a_GMGE).divide(1000000).format('0.0'), numeral(e_GMGE).divide(1000000).format('0.0'),  numeral(e_GMGE - a_GMGE).divide(1000000).format('0.0'), numeral(avanceGMGE ? avanceGMGE : 0).format('0%') ];
+        tableGMM = ['', 'GMM', numeral(a_GMM).divide(1000000).format('0.0'), numeral(e_GMM).divide(1000000).format('0.0'),  numeral(e_GMM - a_GMM).divide(1000000).format('0.0'), numeral(avanceGMM ? avanceGMM : 0).format('0%') ];
+        tableGMOPI = ['', 'GMOPI', numeral(a_GMOPI).divide(1000000).format('0.0'), numeral(e_GMOPI).divide(1000000).format('0.0'),  numeral(e_GMOPI - a_GMOPI).divide(1000000).format('0.0'), numeral(avanceGMOPI ? avanceGMOPI : 0).format('0%') ];
+        tableSPRN = ['Total SPRN APV', numeral(a_SPRN).divide(1000000).format('0.0'), numeral(e_SPRN).divide(1000000).format('0.0'),  numeral(e_SPRN - a_SPRN).divide(1000000).format('0.0'), numeral(avanceSPRN ? avanceSPRN : 0).format('0%') ];
+        tableCSTPIP = ['SASEP', 'CSTPIP', numeral(a_CSTPIP).divide(1000000).format('0.0'), numeral(e_CSTPIP).divide(1000000).format('0.0'),  numeral(e_CSTPIP - a_CSTPIP).divide(1000000).format('0.0'), numeral(avanceCSTPIP ? avanceCSTPIP : 0).format('0%') ];
+        tableGSMCCIT = ['', 'GSMCCIT', numeral(a_GSMCCIT).divide(1000000).format('0.0'), numeral(e_GSMCCIT).divide(1000000).format('0.0'),  numeral(e_GSMCCIT - a_GSMCCIT).divide(1000000).format('0.0'), numeral(avanceGSMCCIT ? avanceGSMCCIT : 0).format('0%') ];
+        tableGSSLT = ['', 'GSSLT', numeral(a_GSSLT).divide(1000000).format('0.0'), numeral(e_GSSLT).divide(1000000).format('0.0'),  numeral(e_GSSLT - a_GSSLT).divide(1000000).format('0.0'), numeral(avanceGSSLT ? avanceGSSLT : 0).format('0%') ];
+        tableSASEP = ['Total SASEP', numeral(a_SASEP).divide(1000000).format('0.0'), numeral(e_SASEP).divide(1000000).format('0.0'),  numeral(e_SASEP - a_SASEP).divide(1000000).format('0.0'), numeral(avanceSASEP ? avanceSASEP : 0).format('0%') ];
+        tableGMSSTPA = ['SSSTPA', 'GMSSTPA', numeral(a_GMSSTPA).divide(1000000).format('0.0'), numeral(e_GMSSTPA).divide(1000000).format('0.0'),  numeral(e_GMSSTPA - a_GMSSTPA).divide(1000000).format('0.0'), numeral(avanceGMSSTPA ? avanceGMSSTPA : 0).format('0%') ];
+        tableSSSTPA = ['Total SSSTPA', numeral(a_SSSTPA).divide(1000000).format('0.0'), numeral(e_SSSTPA).divide(1000000).format('0.0'),  numeral(e_SSSTPA - a_SSSTPA).divide(1000000).format('0.0'), numeral(avanceSSSTPA ? avanceSSSTPA : 0).format('0%') ];
+        tableInversion = ['Total Inversión', numeral(a_Total).divide(1000000).format('0.0'), numeral(e_Total).divide(1000000).format('0.0'),  numeral(e_Total - a_Total).divide(1000000).format('0.0'), numeral(avanceTotal ? avanceTotal : 0).format('0%') ];
+        tableAARecepcionado = [numeral(received.AA).divide(1000000).format('0.0'), numeral(received.AA + e_AA).divide(1000000).format('0.0'),  numeral((received.AA + e_AA) - a_AA).divide(1000000).format('0.0'), numeral(avanceEsperadoAA ? avanceEsperadoAA : 0).format('0%') ];
+        tableCGDUOSRecepcionado = [numeral(received.CGDUOS).divide(1000000).format('0.0'), numeral(received.CGDUOS + e_CGDUOS).divide(1000000).format('0.0'),  numeral((received.CGDUOS + e_CGDUOS) - a_CGDUOS).divide(1000000).format('0.0'), numeral(avanceEsperadoCGDUOS ? avanceEsperadoCGDUOS : 0).format('0%') ];
+        tableGMDERecepcionado = [numeral(received.GMDE).divide(1000000).format('0.0'), numeral(received.GMDE + e_GMDE).divide(1000000).format('0.0'),  numeral((received.GMDE + e_GMDE) - a_GMDE).divide(1000000).format('0.0'), numeral(avanceEsperadoGMDE ? avanceEsperadoGMDE : 0).format('0%') ];
+        tableGMGERecepcionado = [numeral(received.GMGE).divide(1000000).format('0.0'), numeral(received.GMGE + e_GMGE).divide(1000000).format('0.0'),  numeral((received.GMGE + e_GMGE) - a_GMGE).divide(1000000).format('0.0'), numeral(avanceEsperadoGMGE ? avanceEsperadoGMGE : 0).format('0%') ];
+        tableGMMRecepcionado = [numeral(received.GMM).divide(1000000).format('0.0'), numeral(received.GMM + e_GMM).divide(1000000).format('0.0'),  numeral((received.GMM + e_GMM) - a_GMM).divide(1000000).format('0.0'), numeral(avanceEsperadoGMM ? avanceEsperadoGMM : 0).format('0%') ];
+        tableGMOPIRecepcionado = [numeral(received.GMOPI).divide(1000000).format('0.0'), numeral(received.GMOPI + e_GMOPI).divide(1000000).format('0.0'),  numeral((received.GMOPI + e_GMOPI) - a_GMOPI).divide(1000000).format('0.0'), numeral(avanceEsperadoGMOPI ? avanceEsperadoGMOPI : 0).format('0%') ];
+        tableSPRNRecepcionado = [numeral(recepcionadoSPRN).divide(1000000).format('0.0'), numeral(recepcionadoSPRN + e_SPRN).divide(1000000).format('0.0'),  numeral((recepcionadoSPRN + e_SPRN) - a_SPRN).divide(1000000).format('0.0'), numeral(avanceEsperadoSPRN ? avanceEsperadoSPRN : 0).format('0%') ];
+        tableCSTPIPRecepcionado = [numeral(received.CSTPIP).divide(1000000).format('0.0'), numeral(received.CSTPIP + e_CSTPIP).divide(1000000).format('0.0'),  numeral((received.CSTPIP + e_CSTPIP) - a_CSTPIP).divide(1000000).format('0.0'), numeral(avanceEsperadoCSTPIP ? avanceEsperadoCSTPIP : 0).format('0%') ];
+        tableGMCCITRecepcionado = [numeral(received.GSMCCIT).divide(1000000).format('0.0'), numeral(received.GSMCCIT + e_GSMCCIT).divide(1000000).format('0.0'),  numeral((received.GSMCCIT + e_GSMCCIT) - a_GSMCCIT).divide(1000000).format('0.0'), numeral(avanceEsperadoGSMCCIT ? avanceEsperadoGSMCCIT : 0).format('0%') ];
+        tableGSSLTRecepcionado = [numeral(received.GSSLT).divide(1000000).format('0.0'), numeral(received.GSSLT + e_GSSLT).divide(1000000).format('0.0'),  numeral((received.GSSLT + e_GSSLT) - a_GSSLT).divide(1000000).format('0.0'), numeral(avanceEsperadoGSSLT ? avanceEsperadoGSSLT : 0).format('0%') ];
+        tableSASEPRecepcionado = [numeral(recepcionadoSASEP).divide(1000000).format('0.0'), numeral(recepcionadoSASEP + e_SASEP).divide(1000000).format('0.0'),  numeral((recepcionadoSASEP + e_SASEP) - a_SASEP).divide(1000000).format('0.0'), numeral(avanceEsperadoSASEP ? avanceEsperadoSASEP : 0).format('0%') ];
+        tableGMSSTPARecepcionado = [numeral(received.GMSSTPA).divide(1000000).format('0.0'), numeral(received.GMSSTPA + e_GMSSTPA).divide(1000000).format('0.0'),  numeral((received.GMSSTPA + e_GMSSTPA) - a_GMSSTPA).divide(1000000).format('0.0'), numeral(avanceEsperadoGMSSTPA ? avanceEsperadoGMSSTPA : 0).format('0%') ];
+        tableSSSTPARecepcionado = [numeral(recepcionadoSSSTPA).divide(1000000).format('0.0'), numeral(recepcionadoSSSTPA + e_SSSTPA).divide(1000000).format('0.0'),  numeral((recepcionadoSSSTPA + e_SSSTPA) - a_SSSTPA).divide(1000000).format('0.0'), numeral(avanceEsperadoSSSTPA ? avanceEsperadoSSSTPA : 0).format('0%') ];
+        tableTotalInversionRecepcionado = [numeral(recepcionadoTotal).divide(1000000).format('0.0'), numeral(recepcionadoTotal + e_Total).divide(1000000).format('0.0'),  numeral((recepcionadoTotal + e_Total) - a_Total).divide(1000000).format('0.0'), numeral(avanceEsperadoTotal ? avanceEsperadoTotal : 0).format('0%') ];
+        6
+13
+20
+27
+3
+10
+17
+24
+2
+9
+16
+23
+30
+6
+13
+20
+27
+4
+11
+18
+        var dias = []
+        res.status(200).json({
+            status: 'Success',
+            mesInicial,
+            mesFinal,
+            realChart,
+            adecChart,
+            realTable,
+            adecTableSuma,
+            realTableSuma,
+            adecSumaAvance,
+            avance,
+            dias,
+            totalEjercicio,
+            tableAA,
+            tableCGDUOS,
+            tableGMDE,
+            tableGMGE,
+            tableGMM,
+            tableGMOPI,
+            tableSPRN,
+            tableCSTPIP,
+            tableGSMCCIT,
+            tableGSSLT,
+            tableSASEP,
+            tableGMSSTPA,
+            tableSSSTPA,
+            tableInversion,
+            tableAARecepcionado,
+            tableCGDUOSRecepcionado,
+            tableGMDERecepcionado,
+            tableGMGERecepcionado,
+            tableGMMRecepcionado,
+            tableGMOPIRecepcionado,
+            tableSPRNRecepcionado,
+            tableCSTPIPRecepcionado,
+            tableGMCCITRecepcionado,
+            tableGSSLTRecepcionado,
+            tableSASEPRecepcionado,
+            tableGMSSTPARecepcionado,
+            tableSSSTPARecepcionado,
+            tableTotalInversionRecepcionado
         });
     } catch (err) {
         console.log(err);
