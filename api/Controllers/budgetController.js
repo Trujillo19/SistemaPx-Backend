@@ -1124,9 +1124,12 @@ slide7.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
 slide7.addText('Comentarios', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
 slide7.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 // Write the file
-pres.writeFile(filename);
+pres.writeFile(filename)
+.then(filename => {
+    res.download(`./${filename}.pptx`);
+});
 
-res.download(`./${filename}.pptx`);
+
         // res.status(200).json({
         //     status: 'Success',
         //     mesInicial,
