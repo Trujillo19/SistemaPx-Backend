@@ -7,7 +7,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
 const corsOptions = {
-    exposedHeaders: ['Authorization', 'Content-Disposition'],
+    allowedHeaders: ['Authorization', 'Content-Type', 'Content-Disposition']
 };
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
