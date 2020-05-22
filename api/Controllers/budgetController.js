@@ -1126,7 +1126,7 @@ slide7.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 // Write the file
 pres.writeFile(filename)
 .then(filename => {
-    res.download(`./${filename}.pptx`);
+    res.download(`./${filename}`);
 });
 
 
