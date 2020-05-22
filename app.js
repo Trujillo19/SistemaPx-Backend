@@ -19,9 +19,7 @@ const AppError = require('./api/Helpers/appError');
 const app = express();
 
 // Allow All Cross-Origin request
-app.use(cors({
-    exposedHeaders: ['Content-Disposition']
-}));
+app.use(cors());
 // Set security HTTP headers
 app.use(helmet());
 // Limit requests
