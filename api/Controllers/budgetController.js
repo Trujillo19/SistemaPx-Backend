@@ -902,6 +902,62 @@ exports.getPresentation = async (req, res, next) => {
         slide1.addText('Pemex Exploración y Producción', { x: 0, y: 3.6, w: 10, h:0.5, color: 'BC955C', align: 'center', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
         slide1.addText(`Boca del Río, Veracruz ${dia} de ${mes} de ${ano}`, { x: 0, y: 4.2, w: 10, h:0.5, color: 'BC955C', align: 'center', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
         slide1.addImage({ path:'./logo-pemex.png', x:3.04, y:5.5, w:3.93, h:1.57 });
+        // Slide 2
+        let slide2 = pres.addSlide();
+        slide2.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+        slide2.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+        slide2.addText('PRESUPUESTO DE INVERSIÓN', { x: 2.13, y: 2.58, w:7.54, h:1.12, color: 'B38E5D', align: 'right', fontFace:'Montserrat Regular', fontSize: 21, bold: true});
+        slide2.addShape(pres.shapes.LINE,      { x:2.13, y:4, w:7.54, h:0.0, line:'B38E5D', lineSize:4 });
+        // Slide 3
+        let slide3 = pres.addSlide();
+        var Meses = ['Ene','Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul','Ago','Sep', 'Oct','Nov','Dic'];
+        var arrDataLineStat = [];
+        var tmpObjRed = { name:'REAL', labels:Meses, values:realChart};
+        var tmpObjAmb = { name:'ADEC II', labels:Meses, values:adecChart};
+        arrDataLineStat.push( tmpObjRed );
+        arrDataLineStat.push( tmpObjAmb );
+        var optsChartLine1 = {
+            x:0.5,
+            y:1.6,
+            w:9.0,
+            h:2,
+            catAxisLabelFontBold: true,
+            catAxisLabelFontFace: 'Montserrat SemiBold',
+            catAxisLabelFontSize: 15,
+            chartColors: [ '691B31', '41955B'],
+            lineSize  : 4,
+            lineSmooth: false,
+            showLegend: true,
+            legendPos: 't',
+            legendFontSize:20,
+            legendFontFace:'Montserrat SemiBold',
+            lineDataSymbol: 'diamond',
+            lineDataSymbolSize: 13,
+            showValue:true,
+            legendColor: '000000',
+            valAxisHidden:true,
+            catAxisLabelPos: 'high',
+            valGridLine: {style: 'none'},
+            dataLabelFontBold: true,
+            dataLabelFontSize: 14,
+            dataLabelPosition: 't'
+        };
+        var AdecuadoAnual = [{ text: 'ADEC II', options: { fill: '606060' } }, adecChart[0],adecChart[1],adecChart[2],adecChart[3],adecChart[4],adecChart[5],adecChart[6],adecChart[7],adecChart[8],adecChart[9],adecChart[10],adecChart[11],adecTableSuma];
+        var AdecuadoReal = [{ text: 'REAL', options: { color: 'ff0000', fill: '606060' } }, realTable[0],realTable[1],realTable[2],realTable[3],realTable[4],realTable[5],realTable[6],realTable[7],realTable[8],realTable[9],realTable[10],realTable[11], { text: realTableSuma, options: { color: '691B31'}}];
+        var TablaDiapositiva3 =  [];
+        TablaDiapositiva3.push(AdecuadoAnual);
+        TablaDiapositiva3.push(AdecuadoReal);
+        slide3.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+        slide3.addChart( pres.charts.LINE, arrDataLineStat, optsChartLine1);
+        slide3.addTable( TablaDiapositiva3, {x: 0.5, y: 4.4, fill: 'f2f2f2', fontFace:'Montserrat Regular', fontSize: 18, bold:true, align: 'center', border: {type: 'solid', pt:3 } } );
+        slide3.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+        slide3.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+        slide3.addText('Devengable', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+        slide3.addText(tableInversion[4], { shape:pres.shapes.OVAL, x:2, y:5.6, w:1.4, h:0.73, fill:'FF0000', color:'FFFFFF', align:'center', fontSize:21,bold:true });
+        slide3.addText(`Cumplimiento del periodo ${mesInicial} - ${mesFinal}`, {x: 1.84, y: 6.3, w: 1.72, h:0.95, color: '000000', align: 'center', fontFace:'Arial', fontSize: 16.8});
+        slide3.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+        slide3.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
+        // Write the file
         pres.writeFile(filename);
 
         res.download(`./${filename}.pptx`);
