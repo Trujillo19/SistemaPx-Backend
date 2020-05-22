@@ -6,9 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
-const corsOptions = {
-    allowedHeaders: ['Authorization', 'Content-Type', 'Content-Disposition']
-};
+
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
 const budgetRoutes = require('./api/Routes/budgetRoutes');
@@ -21,7 +19,7 @@ const AppError = require('./api/Helpers/appError');
 const app = express();
 
 // Allow Cross-Origin request
-app.use(cors(corsOptions));
+app.use(cors());
 // Set security HTTP headers
 app.use(helmet());
 // Limit requests
