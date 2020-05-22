@@ -957,10 +957,176 @@ exports.getPresentation = async (req, res, next) => {
         slide3.addText(`Cumplimiento del periodo ${mesInicial} - ${mesFinal}`, {x: 1.84, y: 6.3, w: 1.72, h:0.95, color: '000000', align: 'center', fontFace:'Arial', fontSize: 16.8});
         slide3.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
         slide3.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
-        // Write the file
-        pres.writeFile(filename);
+        // Slide 4
+        let slide4 = pres.addSlide();
+        slide4.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+        slide4.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+        slide4.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+        slide4.addText(`Ejercicio presupuestal ${mesInicial} - ${mesFinal} ${ano}`, { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+        slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+        // Slide 5
+        let diapositiva5 = pres.addSlide();
+        var colorAA;
+        var colorCGDUOS;
+        var colorGMDE;
+        var colorGMGE;
+        var colorGMM;
+        var colorGMOPI;
+        var colorSPRN;
+        var colorCSTPIP;
+        var colorGSMCCIT;
+        var colorGSSLT;
+        var colorSASEP;
+        var colorGMSSTPA;
+        var colorSSSTPA;
+        var colorTotalInversion;
+        var colorAARecepcionado;
+        var colorCGDUOSRecepcionado;
+        var colorGMDERecepcionado;
+        var colorGMGERecepcionado;
+        var colorGMMRecepcionado;
+        var colorGMOPIRecepcionado;
+        var colorSPRNRecepcionado;
+        var colorCSTPIPRecepcionado;
+        var colorGSMCCITRecepcionado;
+        var colorGSSLTRecepcionado;
+        var colorSASEPRecepcionado;
+        var colorGMSSTPARecepcionado;
+        var colorSSSTPARecepcionado;
+        var colorTotalInversionRecepcionado;
 
-        res.download(`./${filename}.pptx`);
+(parseFloat(tableAA[4]) < 0) ? colorAA = 'FF0000' : colorAA = '000000';
+(parseFloat(tableCGDUOS[4]) < 0) ? colorCGDUOS = 'FF0000' : colorCGDUOS = '000000';
+(parseFloat(tableGMDE[4]) < 0) ? colorGMDE = 'FF0000' : colorGMDE = '000000';
+(parseFloat(tableGMGE[4]) < 0) ? colorGMGE = 'FF0000' : colorGMGE = '000000';
+(parseFloat(tableGMM[4]) < 0) ? colorGMM = 'FF0000' : colorGMM = '000000';
+(parseFloat(tableGMOPI[4]) < 0) ? colorGMOPI = 'FF0000' : colorGMOPI = '000000';
+(parseFloat(tableSPRN[3]) < 0) ? colorSPRN = 'FF0000' : colorSPRN = '000000';
+(parseFloat(tableCSTPIP[4]) < 0) ? colorCSTPIP = 'FF0000' : colorCSTPIP = '000000';
+(parseFloat(tableGSMCCIT[4]) < 0) ? colorGSMCCIT = 'FF0000' : colorGSMCCIT = '000000';
+(parseFloat(tableGSSLT[4]) < 0) ? colorGSSLT = 'FF0000' : colorGSSLT = '000000';
+(parseFloat(tableSASEP[3]) < 0) ? colorSASEP = 'FF0000' : colorSASEP = '000000';
+(parseFloat(tableGMSSTPA[4]) < 0) ? colorGMSSTPA = 'FF0000' : colorGMSSTPA = '000000';
+(parseFloat(tableSSSTPA[3]) < 0) ? colorSSSTPA = 'FF0000' : colorSSSTPA = '000000';
+(parseFloat(tableInversion[3]) < 0) ? colorTotalInversion = 'FF0000' : colorTotalInversion = '000000';
+(parseFloat(tableAARecepcionado[2]) < 0) ? colorAARecepcionado = 'FF0000' : colorAARecepcionado = '000000';
+(parseFloat(tableCGDUOSRecepcionado[2]) < 0) ? colorCGDUOSRecepcionado = 'FF0000' : colorCGDUOSRecepcionado = '000000';
+(parseFloat(tableGMDERecepcionado[2]) < 0) ? colorGMDERecepcionado = 'FF0000' : colorGMDERecepcionado = '000000';
+(parseFloat(tableGMGERecepcionado[2]) < 0) ? colorGMGERecepcionado = 'FF0000' : colorGMGERecepcionado = '000000';
+(parseFloat(tableGMMRecepcionado[2]) < 0) ? colorGMMRecepcionado = 'FF0000' : colorGMMRecepcionado = '000000';
+(parseFloat(tableGMOPIRecepcionado[2]) < 0) ? colorGMOPIRecepcionado = 'FF0000' : colorGMOPIRecepcionado = '000000';
+(parseFloat(tableSPRNRecepcionado[2]) < 0) ? colorSPRNRecepcionado = 'FF0000' : colorSPRNRecepcionado = '000000';
+(parseFloat(tableCSTPIPRecepcionado[2]) < 0) ? colorCSTPIPRecepcionado = 'FF0000' : colorCSTPIPRecepcionado = '000000';
+(parseFloat(tableGMCCITRecepcionado[2]) < 0) ? colorGSMCCITRecepcionado = 'FF0000' : colorGSMCCITRecepcionado = '000000';
+(parseFloat(tableGSSLTRecepcionado[2]) < 0) ? colorGSSLTRecepcionado = 'FF0000' : colorGSSLTRecepcionado = '000000';
+(parseFloat(tableSASEPRecepcionado[2]) < 0) ? colorSASEPRecepcionado = 'FF0000' : colorSASEPRecepcionado = '000000';
+(parseFloat(tableGMSSTPARecepcionado[2]) < 0) ? colorGMSSTPARecepcionado = 'FF0000' : colorGMSSTPARecepcionado = '000000';
+(parseFloat(tableSSSTPARecepcionado[2]) < 0) ? colorSSSTPARecepcionado = 'FF0000' : colorSSSTPARecepcionado = '000000';
+(parseFloat(tableTotalInversionRecepcionado[2]) < 0) ? colorTotalInversionRecepcionado = 'FF0000' : colorTotalInversionRecepcionado = '000000';
+
+
+
+colorAARecepcionado;
+var presupuesoTable = [];
+var recepcionadoTable = [];
+presupuesoTable.push([{text: '', options: {}},'', {text: `Periodo (${mesInicial} - ${mesFinal})`, options: {fill: 'DCE6F1', bold: true, colspan: 4}}]);
+presupuesoTable.push([{text:'Subdirección', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},{text:'GM', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},{text:'Autorizado', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},{text:'Ejercicio', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},{text:'Desviación', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},{text:'Avance', options: {fill: 'DCE6F1', bold:true, fontSize: 10}},]);
+presupuesoTable.push([{text: tableAA[0]}, {text: tableAA[1]}, {text: tableAA[2]}, {text: tableAA[3]}, {text: tableAA[4], options: {color:colorAA}}, {text: tableAA[5]}]);
+presupuesoTable.push([{text: tableCGDUOS[0]}, {text: tableCGDUOS[1]}, {text: tableCGDUOS[2]}, {text: tableCGDUOS[3]}, {text: tableCGDUOS[4], options: {color:colorCGDUOS}}, {text: tableCGDUOS[5]}]);
+presupuesoTable.push([{text: tableGMDE[0]}, {text: tableGMDE[1]}, {text: tableGMDE[2]}, {text: tableGMDE[3]}, {text: tableGMDE[4], options: {color:colorGMDE}}, {text: tableGMDE[5]}]);
+presupuesoTable.push([{text: tableGMGE[0]}, {text: tableGMGE[1]}, {text: tableGMGE[2]}, {text: tableGMGE[3]}, {text: tableGMGE[4], options: {color:colorGMGE}}, {text: tableGMGE[5]}]);
+presupuesoTable.push([{text: tableGMM[0]}, {text: tableGMM[1]}, {text: tableGMM[2]}, {text: tableGMM[3]}, {text: tableGMM[4], options: {color:colorGMM}}, {text: tableGMM[5]}]);
+presupuesoTable.push([{text: tableGMOPI[0]}, {text: tableGMOPI[1]}, {text: tableGMOPI[2]}, {text: tableGMOPI[3]}, {text: tableGMOPI[4], options: {color:colorGMOPI}}, {text: tableGMOPI[5]}]);
+presupuesoTable.push([{text: tableSPRN[0], options: {bold: true, colspan: 2}}, {text:tableSPRN[1],options: {bold: true}}, {text:tableSPRN[2], options: {bold: true}},{text:tableSPRN[3], options: {color:colorSPRN, bold:true}},{text:tableSPRN[4], options: {bold: true}}]);
+presupuesoTable.push([{text: tableCSTPIP[0]}, {text: tableCSTPIP[1]}, {text: tableCSTPIP[2]}, {text: tableCSTPIP[3]}, {text: tableCSTPIP[4], options: {color:colorCSTPIP}}, {text: tableCSTPIP[5]}]);
+presupuesoTable.push([{text: tableGSMCCIT[0]}, {text: tableGSMCCIT[1]}, {text: tableGSMCCIT[2]}, {text: tableGSMCCIT[3]}, {text: tableGSMCCIT[4], options: {color:colorGSMCCIT}}, {text: tableGSMCCIT[5]}]);
+presupuesoTable.push([{text: tableGSSLT[0]}, {text: tableGSSLT[1]}, {text: tableGSSLT[2]}, {text: tableGSSLT[3]}, {text: tableGSSLT[4], options: {color:colorGSSLT}}, {text: tableGSSLT[5]}]);
+presupuesoTable.push([{text: tableSASEP[0], options: {bold: true, colspan: 2}}, {text:tableSASEP[1], options: {bold: true}},{text:tableSASEP[2], options: {bold: true}},{text: tableSASEP[3], options: {bold: true,color:colorSASEP}},{text:tableSASEP[4], options: {bold: true}}]);
+presupuesoTable.push([{text: tableGMSSTPA[0]}, {text: tableGMSSTPA[1]}, {text: tableGMSSTPA[2]}, {text: tableGMSSTPA[3]}, {text: tableGMSSTPA[4], options: {color:colorGMSSTPA}}, {text: tableGMSSTPA[5]}]);
+presupuesoTable.push([{text: tableSSSTPA[0], options: {bold: true, colspan: 2}}, {text:tableSSSTPA[1], options: {bold:true}},{text:tableSSSTPA[2], options: {bold:true}},{text:tableSSSTPA[3], options: {bold:true, color:colorSSSTPA}},{text:tableSSSTPA[4], options: {bold:true}}]);
+presupuesoTable.push([{text: tableInversion[0], options: {bold: true, colspan: 2}}, {text:tableInversion[1], options: {bold:true}},{text:tableInversion[2], options: {bold:true}},{text:tableInversion[3], options: {bold: true, color:colorTotalInversion}},{text:tableInversion[4], options: {bold:true}}]);
+
+recepcionadoTable.push([{text: 'Registro', options: {fill: 'EBF1DE', bold: true, colspan: 4}}]);
+recepcionadoTable.push([{text:'Recepcionado', options: {fill: 'EBF1DE', bold: true, fontSize: 10}}, {text: 'Ejercicio+Recep.', options: {fill:'EBF1DE', bold:true, fontSize: 10}},{text: 'Desviación', options: {fill:'EBF1DE', bold:true, fontSize: 10}}, {text: 'Avance', options: {fill:'EBF1DE', bold:true, fontSize: 10}},]);
+recepcionadoTable.push([{text: tableAARecepcionado[0]}, {text: tableAARecepcionado[1]}, {text: tableAARecepcionado[2], options: {color:colorAARecepcionado}}, {text: tableAARecepcionado[3]}]);
+recepcionadoTable.push([{text: tableCGDUOSRecepcionado[0]}, {text: tableCGDUOSRecepcionado[1]}, {text: tableCGDUOSRecepcionado[2], options: {color:colorCGDUOSRecepcionado}}, {text: tableCGDUOSRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGMDERecepcionado[0]}, {text: tableGMDERecepcionado[1]},{text: tableGMDERecepcionado[2], options: {color:colorGMDERecepcionado}}, {text: tableGMDERecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGMGERecepcionado[0]}, {text: tableGMGERecepcionado[1]},{text: tableGMGERecepcionado[2], options: {color:colorGMGERecepcionado}}, {text: tableGMGERecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGMMRecepcionado[0]}, {text: tableGMMRecepcionado[1]},{text: tableGMMRecepcionado[2], options: {color:colorGMMRecepcionado}}, {text: tableGMMRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGMOPIRecepcionado[0]}, {text: tableGMOPIRecepcionado[1]}, {text: tableGMOPIRecepcionado[2], options: {color:colorGMOPIRecepcionado}}, {text: tableGMOPIRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableSPRNRecepcionado[0], options: {bold: true}}, {text:tableSPRNRecepcionado[1], options: {bold: true}},{text: tableSPRNRecepcionado[2], options: {bold: true,color:colorSPRNRecepcionado}},{text:tableSPRNRecepcionado[3], options: {bold: true}}]);
+
+recepcionadoTable.push([{text: tableCSTPIPRecepcionado[0]}, {text: tableCSTPIPRecepcionado[1]}, {text: tableCSTPIPRecepcionado[2], options: {color:colorCSTPIPRecepcionado}}, {text: tableCSTPIPRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGMCCITRecepcionado[0]}, {text: tableGMCCITRecepcionado[1]}, {text: tableGMCCITRecepcionado[2], options: {color:colorGSMCCITRecepcionado}}, {text: tableGMCCITRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableGSSLTRecepcionado[0]}, {text: tableGSSLTRecepcionado[1]}, {text: tableGSSLTRecepcionado[2], options: {color:colorGSSLTRecepcionado}}, {text: tableGSSLTRecepcionado[3]}]);
+recepcionadoTable.push([{text: tableSASEPRecepcionado[0], options: {bold: true}}, {text:tableSASEPRecepcionado[1], options: {bold:true}},{text: tableSASEPRecepcionado[2], options: {bold: true,color:colorSASEPRecepcionado}},{text:tableSASEPRecepcionado[3], options: {bold:true}}]);
+
+recepcionadoTable.push([{text: tableGMSSTPARecepcionado[0]}, {text: tableGMSSTPARecepcionado[1]},  {text: tableGMSSTPARecepcionado[2], options: {color:colorGMSSTPARecepcionado}}, {text: tableGMSSTPARecepcionado[3]}]);
+recepcionadoTable.push([{text: tableSSSTPARecepcionado[0], options: {bold: true}},{text:tableSSSTPARecepcionado[1], options: {bold:true}},{text: tableSSSTPARecepcionado[2], options: {bold: true,color:colorSSSTPARecepcionado}},{text:tableSSSTPARecepcionado[3], options: {bold:true}}]);
+recepcionadoTable.push([{text: tableTotalInversionRecepcionado[0], options: {bold: true}}, {text:tableTotalInversionRecepcionado[1], options: {bold:true}},{text: tableTotalInversionRecepcionado[2], options: {bold: true,color:colorTotalInversionRecepcionado}},{text:tableTotalInversionRecepcionado[3], options: {bold:true}}]);
+
+diapositiva5.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+diapositiva5.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+diapositiva5.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+diapositiva5.addText('Devengable', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+diapositiva5.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+diapositiva5.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
+diapositiva5.addTable(presupuesoTable, { x: 0.16, y: 1.8, color:'000000', fontSize: 10, w:5.45, align:'center', border: {color: 'D3D3D3', pt:1}});
+diapositiva5.addTable(recepcionadoTable, { x: 5.71, y: 1.8, color:'000000', fontSize: 10, w:4.13, align:'center', fill: 'FFFFFF', border: {color: 'D3D3D3', pt:1}});
+diapositiva5.addText(`Fecha de extracción: ${dia} de ${mes} de ${ano}`, { x: 0.16, y: 7, w: 3, h:0.27, color: '000000', align: 'center', fontFace:'Arial', fontSize: 10, bold:false});
+// Slide 6
+var HojadeEntradaTable = [];
+HojadeEntradaTable.push(['ACREEDOR', 'IMPORTE', 'HOJA DE ENTRADA']);
+COPADETable = [];
+COPADETable.push(['ACREEDOR', 'IMPORTE', 'COPADES']);
+var ArrayEntrada =  [
+    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
+    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
+    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
+    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
+    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10']
+];
+
+var backgroundcolor;
+for (i=0; i <ArrayEntrada.length; i++) {
+(i%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
+HojadeEntradaTable.push([
+    { text: ArrayEntrada[i][0], options: {color: '000000', fill: backgroundcolor} },
+    { text: ArrayEntrada[i][1], options: {color: '000000', fill: backgroundcolor}},
+    { text: ArrayEntrada[i][2], options: {color: '000000', fill: backgroundcolor}}
+]);
+COPADETable.push([
+    { text: ArrayEntrada[i][0], options: {color: '000000', fill: backgroundcolor} },
+    { text: ArrayEntrada[i][1], options: {color: '000000', fill: backgroundcolor}},
+    { text: ArrayEntrada[i][2], options: {color: '000000', fill: backgroundcolor}}
+]);
+}
+HojadeEntradaTable.push(['Total general','123456','30']);
+COPADETable.push(['Total general','123456','30']);
+
+let diapositiva6 = pres.addSlide();
+diapositiva6.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+diapositiva6.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+diapositiva6.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+diapositiva6.addText('Recepcionado', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+diapositiva6.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+diapositiva6.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
+diapositiva6.addText('Hoja de entrada', { x: 1.4, y: 1.52, w: 2.3, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
+diapositiva6.addTable(HojadeEntradaTable, { x: 1.4, y: 1.9, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', border: {color: 'ffffff', pt:1}});
+diapositiva6.addText('COPADES', { x: 1.4, y: 4.04, w: 1.43, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
+diapositiva6.addTable(COPADETable, { x: 1.4, y: 4.55, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', border: {color: 'ffffff', pt:1}});
+diapositiva6.addText(`Fecha de extracción: ${dia} de ${mes} de ${ano}`, { x: 0.16, y: 7, w: 3, h:0.27, color: '000000', align: 'center', fontFace:'Arial', fontSize: 10, bold:false});
+// Slide 7
+let slide7 = pres.addSlide();
+slide7.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+slide7.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: "000000", align: "right", fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+slide7.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
+slide7.addText('Comentarios', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+slide7.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+// Write the file
+pres.writeFile(filename);
+
+res.download(`./${filename}.pptx`);
         // res.status(200).json({
         //     status: 'Success',
         //     mesInicial,
