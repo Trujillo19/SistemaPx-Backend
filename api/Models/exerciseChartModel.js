@@ -7,6 +7,10 @@ const exerciseChartModel = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    createdAt: {
+        type: Date,
+        required: true
+    },
     day : {
         type: Number,
         required: true

@@ -6,6 +6,7 @@ const AppError = require('../Helpers/appError');
 const numeral = require('../Helpers/numeral');
 const Excel = require('exceljs');
 const sorter = require('../Helpers/sortExercise');
+const pptxgen = require('pptxgenjs');
 
 exports.getBudget = async (req, res, next) => {
     if (!req.query.startDate || !req.query.endDate || !req.query.authName){
@@ -480,10 +481,15 @@ exports.postExercised = async (req, res, next) => {
                 }
                 inputRow = [];
             });
+            var total = 0;
+            var exerciseTotalSum = await exerciseChart.findOne().sort({createdAt: -1});
+            if (exerciseTotalSum){
+                total = total + exerciseTotalSum.exercise;
+            }
             var today = new Date();
-            var total = AA + CGDUOS + GMDE + GMGE + GMM + GMOPI + CSTPIP + GSMCCIT + GSSLT + GMSSTPA;
+            total = total + AA + CGDUOS + GMDE + GMGE + GMM + GMOPI + CSTPIP + GSMCCIT + GSSLT + GMSSTPA;
             var dia = today.getDate();
-            var exerciseTotalChart = await exerciseChart.create({createdBy: user, day:dia, exercise: total });
+            await exerciseChart.create({createdBy: user, createdAt: Date.now(), day:dia, exercise: total,});
             var exercise = await exercisedBudget.create({createdBy: user, createdAt: Date.now(),
                 exerciseDate: inputDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
             res.status(201).json({
@@ -740,7 +746,12 @@ exports.getPresentation = async (req, res, next) => {
         var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
         var received = await receivedBudget.findOne().sort({receivedDate: -1});
         var chartEjercicio = await exerciseChart.find();
-        console.log(chartEjercicio);
+        var totalEjercicio = [];
+        var dias = [];
+        for (var l = 0; l < chartEjercicio.length; l++){
+            totalEjercicio[l] = chartEjercicio[l].exercise;
+            dias[l] = chartEjercicio[l].day;
+        }
         for (j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
             a_AA = a_AA + authorized.AA[j];
             a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
@@ -768,7 +779,7 @@ exports.getPresentation = async (req, res, next) => {
             realTableSuma = realTableSuma + realChart[i];
             realChart[i] = numeral(realChart[i]).divide(1000000).format('0');
             realTable[i] = realChart[i];
-            adecSumaAvance = adecSumaAvance + parseInt(adecChart[i]);
+            adecSumaAvance = adecSumaAvance + parseFloat(adecChart[i]);
             e_AA = e_AA + exercise[i].AA;
             e_CGDUOS = e_CGDUOS+ exercise[i].CGDUOS;
             e_GMDE = e_GMDE + exercise[i].GMDE;
@@ -854,69 +865,86 @@ exports.getPresentation = async (req, res, next) => {
         tableGMSSTPARecepcionado = [numeral(received.GMSSTPA).divide(1000000).format('0.0'), numeral(received.GMSSTPA + e_GMSSTPA).divide(1000000).format('0.0'),  numeral((received.GMSSTPA + e_GMSSTPA) - a_GMSSTPA).divide(1000000).format('0.0'), numeral(avanceEsperadoGMSSTPA ? avanceEsperadoGMSSTPA : 0).format('0%') ];
         tableSSSTPARecepcionado = [numeral(recepcionadoSSSTPA).divide(1000000).format('0.0'), numeral(recepcionadoSSSTPA + e_SSSTPA).divide(1000000).format('0.0'),  numeral((recepcionadoSSSTPA + e_SSSTPA) - a_SSSTPA).divide(1000000).format('0.0'), numeral(avanceEsperadoSSSTPA ? avanceEsperadoSSSTPA : 0).format('0%') ];
         tableTotalInversionRecepcionado = [numeral(recepcionadoTotal).divide(1000000).format('0.0'), numeral(recepcionadoTotal + e_Total).divide(1000000).format('0.0'),  numeral((recepcionadoTotal + e_Total) - a_Total).divide(1000000).format('0.0'), numeral(avanceEsperadoTotal ? avanceEsperadoTotal : 0).format('0%') ];
-        6
-13
-20
-27
-3
-10
-17
-24
-2
-9
-16
-23
-30
-6
-13
-20
-27
-4
-11
-18
-        var dias = []
-        res.status(200).json({
-            status: 'Success',
-            mesInicial,
-            mesFinal,
-            realChart,
-            adecChart,
-            realTable,
-            adecTableSuma,
-            realTableSuma,
-            adecSumaAvance,
-            avance,
-            dias,
-            totalEjercicio,
-            tableAA,
-            tableCGDUOS,
-            tableGMDE,
-            tableGMGE,
-            tableGMM,
-            tableGMOPI,
-            tableSPRN,
-            tableCSTPIP,
-            tableGSMCCIT,
-            tableGSSLT,
-            tableSASEP,
-            tableGMSSTPA,
-            tableSSSTPA,
-            tableInversion,
-            tableAARecepcionado,
-            tableCGDUOSRecepcionado,
-            tableGMDERecepcionado,
-            tableGMGERecepcionado,
-            tableGMMRecepcionado,
-            tableGMOPIRecepcionado,
-            tableSPRNRecepcionado,
-            tableCSTPIPRecepcionado,
-            tableGMCCITRecepcionado,
-            tableGSSLTRecepcionado,
-            tableSASEPRecepcionado,
-            tableGMSSTPARecepcionado,
-            tableSSSTPARecepcionado,
-            tableTotalInversionRecepcionado
-        });
+        let pres = new pptxgen();
+        pres.layout = 'LAYOUT_4x3';
+        var today = new Date();
+        var dia = today.getDate();
+        var mes;
+        switch (today.getMonth()) {
+            case 0:
+                mes = 'enero';
+                break;
+            case 1:
+                mes = 'febrero';
+                break;
+            case 2:
+                mes = 'marzo';
+                break;
+            case 3:
+                mes = 'abril';
+                break;
+            case 4:
+                mes = 'mayo';
+                break;
+            case 5:
+                mes = 'junio';
+                break;
+        }
+        var ano = today.getFullYear();
+        var filename = `Estado actual ppto-${dia}-${mes}-${ano}`;
+        // Slide 1
+        let slide1 = pres.addSlide();
+        slide1.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
+        slide1.addText('Activo de Producción Veracruz', { x: 0, y: 2, w: 10, h:0.5, color: 'B38E5D', align: 'center', fontFace:'Montserrat Regular', fontSize: 20});
+        slide1.addText('Revisión del presupuesto de Inversión 2020', { x: 0, y: 2.3, w: 10, h:0.5, color: 'B38E5D', align: 'center', fontFace:'Montserrat Regular', fontSize: 18});
+        slide1.addText('SUBDIRECCIÓN DE PRODUCCIÓN REGIÓN NORTE', { x: 0, y: 3, w: 10, h:0.5, color: 'B38E5D', align: 'center', fontFace:'Montserrat Regular', fontSize: 21});
+        slide1.addShape(pres.shapes.LINE,      { x:1.13, y:3.5, w:7.74, h:0.0, line:'B38E5D', lineSize:4 });
+        slide1.addText('Pemex Exploración y Producción', { x: 0, y: 3.6, w: 10, h:0.5, color: 'BC955C', align: 'center', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
+        slide1.addText(`Boca del Río, Veracruz ${dia} de ${mes} de ${ano}`, { x: 0, y: 4.2, w: 10, h:0.5, color: 'BC955C', align: 'center', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
+        slide1.addImage({ path:'./logo-pemex.png', x:3.04, y:5.5, w:3.93, h:1.57 });
+        pres.writeFile(filename);
+
+        res.download(`./${filename}.pptx`);
+        // res.status(200).json({
+        //     status: 'Success',
+        //     mesInicial,
+        //     mesFinal,
+        //     realChart,
+        //     adecChart,
+        //     realTable,
+        //     adecTableSuma,
+        //     realTableSuma,
+        //     dias,
+        //     totalEjercicio,
+        //     tableAA,
+        //     tableCGDUOS,
+        //     tableGMDE,
+        //     tableGMGE,
+        //     tableGMM,
+        //     tableGMOPI,
+        //     tableSPRN,
+        //     tableCSTPIP,
+        //     tableGSMCCIT,
+        //     tableGSSLT,
+        //     tableSASEP,
+        //     tableGMSSTPA,
+        //     tableSSSTPA,
+        //     tableInversion,
+        //     tableAARecepcionado,
+        //     tableCGDUOSRecepcionado,
+        //     tableGMDERecepcionado,
+        //     tableGMGERecepcionado,
+        //     tableGMMRecepcionado,
+        //     tableGMOPIRecepcionado,
+        //     tableSPRNRecepcionado,
+        //     tableCSTPIPRecepcionado,
+        //     tableGMCCITRecepcionado,
+        //     tableGSSLTRecepcionado,
+        //     tableSASEPRecepcionado,
+        //     tableGMSSTPARecepcionado,
+        //     tableSSSTPARecepcionado,
+        //     tableTotalInversionRecepcionado
+        // });
     } catch (err) {
         console.log(err);
         next(err);
