@@ -744,6 +744,7 @@ exports.getPresentation = async (req, res, next) => {
     }
     var mesInicial;
     var mesFinal;
+    var anoSlide4 = ['Enero','Febrero','Marzo','Abril', 'Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     const startDate = new Date(req.query.startDate+ 'GMT-0600');
     const endDate = new Date(req.query.endDate+ 'GMT-0600');
     var monthDiff = endDate.getMonth() - startDate.getMonth();
@@ -894,8 +895,7 @@ exports.getPresentation = async (req, res, next) => {
             dias.push(exerciseChartRes[k77].exerciseDate.toISOString().split('T')[0]);
             totalEjercicio.push(exerciseChartRes[k77].exerciseTotal);
         }
-        console.log(dias);
-        console.log(totalEjercicio);
+
         var ArrayEntrada = [];
         var ArrayCopade = [];
         var entradaTotal = [];
@@ -1154,7 +1154,7 @@ exports.getPresentation = async (req, res, next) => {
         slide3.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
         // Slide 4
         let slide4 = pres.addSlide();
-   
+
         var arrDataLineStat2 = [];
         var tmpObjRed1 = { name:'Ejercicio', labels:dias, values:totalEjercicio};
         arrDataLineStat2.push( tmpObjRed1 );
@@ -1194,6 +1194,16 @@ exports.getPresentation = async (req, res, next) => {
         slide4.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
         slide4.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
         slide4.addText(`Ejercicio presupuestal ${mesInicial} - ${mesFinal} ${ano}`, { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+        var x=1.07;
+        var x2 = 1.05;
+        var bgcolor;
+        for(let i = 0; i <= monthDiff; i++) {
+            (i%2===0) ? bgcolor = 'E6B8B7' : bgcolor ='F2DCDB';
+            slide4.addShape(pres.shapes.RECTANGLE,{ x:x2, y:1.7, w:1.63, h:3.64, fill:bgcolor });
+            slide4.addText(anoSlide4[i], {x:x, y:1.66, w:2,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
+            x = x+1.63;
+            x2 =x2+1.63;
+        }
         slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
         //slide4.addTable(TablaDiapositiva4, {x:5.5, y:5.3, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
         slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
