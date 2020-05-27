@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const exerciseChartModel = new mongoose.Schema({
+const copadeBudgetModel = new mongoose.Schema({
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -11,19 +11,19 @@ const exerciseChartModel = new mongoose.Schema({
         type: Date,
         required: true
     },
-    exerciseDate : {
+    CopadeDate: {
         type: Date,
         required: true
     },
-    exerciseTotal: {
-        type: Number,
+    COPADEs: {
+        type: [String],
         required: true
     }
 });
 
-exerciseChartModel.pre('save', async (next) => {
+copadeBudgetModel.pre('save', async (next) => {
     return next();
 });
 
-const exerciseChart = mongoose.model('exerciseChart', exerciseChartModel);
-module.exports = exerciseChart;
+const copadeBudget = mongoose.model('copadeBudget', copadeBudgetModel);
+module.exports = copadeBudget;

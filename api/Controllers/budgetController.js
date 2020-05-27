@@ -2,6 +2,8 @@ const authorizedBudget = require('../Models/newAuthorizedBudgetModel');
 const exercisedBudget = require('../Models/newExerciseBudgetModel');
 const receivedBudget = require('../Models/receivedBudgetModel');
 const exerciseChart = require('../Models/exerciseChartModel');
+const copadeBudget = require('../Models/CopadeBugdetModel');
+const HojaCopade = require('../Models/HojaCopadeModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('../Helpers/numeral');
 const Excel = require('exceljs');
@@ -482,16 +484,15 @@ exports.postExercised = async (req, res, next) => {
                 inputRow = [];
             });
             var total = 0;
-            var exerciseTotalSum = await exerciseChart.findOne().sort({createdAt: -1});
-            if (exerciseTotalSum){
-                total = total + exerciseTotalSum.exercise;
-            }
-            var today = new Date();
-            total = total + AA + CGDUOS + GMDE + GMGE + GMM + GMOPI + CSTPIP + GSMCCIT + GSSLT + GMSSTPA;
-            var dia = today.getDate();
-            await exerciseChart.create({createdBy: user, createdAt: Date.now(), day:dia, exercise: total,});
             var exercise = await exercisedBudget.create({createdBy: user, createdAt: Date.now(),
                 exerciseDate: inputDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
+            var todosEjercicios = await exercisedBudget.find().sort({exerciseDate: -1});
+            for (var j3 = 0; j3 < todosEjercicios.length; j3++) {
+                total = total + todosEjercicios[j3].AA + todosEjercicios[j3].CGDUOS + todosEjercicios[j3].GMDE +
+                todosEjercicios[j3].GMGE + todosEjercicios[j3].GMM + todosEjercicios[j3].GMOPI + todosEjercicios[j3].CSTPIP
+                + todosEjercicios[j3].GSMCCIT + todosEjercicios[j3].GSSLT + todosEjercicios[j3].GMSSTPA;
+            }
+            await exerciseChart.create({createdBy: user, createdAt: Date.now(), exerciseDate: Date.now(), exerciseTotal:total});
             res.status(201).json({
                 status: 'Created',
                 data: {
@@ -526,12 +527,18 @@ exports.postReceived = async (req, res, next) => {
     var GSMCCIT = 0;
     var GSSLT = 0;
     var GMSSTPA = 0;
+    var COPADETable = [];
+    var HojadeEntradaTable = [];
     const colCentroGestor = 8;
     const colPosicionFinanciera = 9;
     const colPosicionPresupuestal = 10;
     const colContrato = 3;
     var inputRow = [];
     try {
+        var copade = await copadeBudget.findOne().sort({createdAt: -1});
+        var pedido;
+        var posicion;
+        var llave;
         var workbook = new Excel.Workbook();
         workbook.xlsx.readFile(filepath)
         .then(async () => {
@@ -545,39 +552,131 @@ exports.postReceived = async (req, res, next) => {
                         colPosicionPresupuestal,colContrato);
                     switch (outputRow[0]) {
                         case 'AA':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             AA = AA + outputRow[23];
                             break;
                         case 'CGDUOS':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             CGDUOS = CGDUOS + outputRow[23];
                             break;
                         case 'GMDE':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GMDE = GMDE + outputRow[23];
                             break;
                         case 'GMGE':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GMGE = GMGE + outputRow[23];
                             break;
                         case 'GMM':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GMM = GMM + outputRow[23];
                             break;
                         case 'GMOPI':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GMOPI = GMOPI + outputRow[23];
                             break;
                         case 'CSTPIP':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             CSTPIP = CSTPIP + outputRow[23];
                             break;
                         case 'GSMCCIT':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GSMCCIT = GSMCCIT + outputRow[23];
                             break;
                         case 'GSSLT':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GSSLT = GSSLT + outputRow[23];
                             break;
                         case 'GMSSTPA':
+                            pedido = outputRow[2];
+                            posicion = outputRow[3];
+                            llave = pedido.concat(posicion);
+                            if (copade.COPADEs.includes(llave)) {
+                                COPADETable.push([outputRow[6], outputRow[23]]);
+                            }
+                            else {
+                                HojadeEntradaTable.push([outputRow[6], outputRow[23]]);
+                            }
                             GMSSTPA = GMSSTPA + outputRow[23];
                             break;
                     }
                 }
                 inputRow = [];
             });
+            var hojaCopade = await HojaCopade.create({createdBy: user, createdAt: Date.now(),
+                CopadeDate: copade.CopadeDate, COPADE: COPADETable, HojadeEntrada: HojadeEntradaTable});
             var received = await receivedBudget.create({createdBy: user, createdAt: Date.now(),
                 receivedDate: receivedDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
             res.status(201).json({
@@ -591,6 +690,49 @@ exports.postReceived = async (req, res, next) => {
             return next(new AppError(500, 'Server error', err.message));
         });
     } catch (err) {
+        console.log(err);
+        next(err);
+    }
+};
+
+exports.postCopades = async (req, res, next) => {
+    if (!req.file || !req.body.sheetName || !req.body.copadeDate){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var sheetName = req.body.sheetName;
+    var copadeDate = new Date(req.body.copadeDate);
+    var filepath =  './' + req.file.path;
+    var user = req.user;
+    var copadeArray = [];
+    try {
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(filepath)
+        .then(async () => {
+            var worksheet = workbook.getWorksheet(sheetName);
+            worksheet.eachRow((row,rowNumber) => {
+                if (rowNumber !== 1){
+                    if(row.values[9]) {
+                        var pedido = row.values[6];
+                        var posicion = row.values[5];
+                        var llave = pedido.concat(posicion);
+                        copadeArray.push(llave);
+                    }
+                }
+            });
+            var copades = await copadeBudget.create({createdBy: user, createdAt: Date.now(),
+                COPADEs: copadeArray, CopadeDate: copadeDate});
+            res.status(201).json({
+                status: 'Created',
+                copades
+            });
+        })
+        .catch ( (err)  => {
+            console.log(err);
+            return next(new AppError(500, 'Server error', err.message));
+        });
+
+    }
+    catch (err){
         console.log(err);
         next(err);
     }
@@ -687,7 +829,6 @@ exports.getPresentation = async (req, res, next) => {
     var realTable = [];
     var adecTableSuma = 0;
     var realTableSuma = 0;
-    var avance = 0;
     var adecSumaAvance = 0;
     var tableAA = [];
     var tableCGDUOS = [];
@@ -738,20 +879,74 @@ exports.getPresentation = async (req, res, next) => {
     var a_GSSLT = 0;
     var a_GMSSTPA = 0;
     const authName = req.query.authName;
+    var dias = [];
+    var totalEjercicio = [];
     if (endDate - startDate < 0 ) {
         return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
     }
     try {
+        var hojayCopade = await HojaCopade.findOne().sort({createdAt: -1});
         var authorized = await authorizedBudget.findOne({authName});
         var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
         var received = await receivedBudget.findOne().sort({receivedDate: -1});
-        var chartEjercicio = await exerciseChart.find();
-        var totalEjercicio = [];
-        var dias = [];
-        for (var l = 0; l < chartEjercicio.length; l++){
-            totalEjercicio[l] = chartEjercicio[l].exercise;
-            dias[l] = chartEjercicio[l].day;
+        var exerciseChartRes = await exerciseChart.find();
+        for (var k77 = 0; k77 < exerciseChartRes.length; k77++) {
+            dias.push(exerciseChartRes[k77].exerciseDate.toISOString().split('T')[0]);
+            totalEjercicio.push(exerciseChartRes[k77].exerciseTotal);
         }
+        console.log(dias);
+        console.log(totalEjercicio);
+        var ArrayEntrada = [];
+        var ArrayCopade = [];
+        var entradaTotal = [];
+        var sumaImporteEntrada = 0;
+        var sumaContadorEntrada = 0;
+        var copadeTotal = [];
+        var sumaImporteCopade = 0;
+        var sumaContadorCopade = 0;
+        for (var i = 0; i < hojayCopade.HojadeEntrada.length; i++){
+            var importe = 0;
+            var suma = 0;
+            for (var k = i; k < hojayCopade.HojadeEntrada.length; k++) {
+                if (hojayCopade.HojadeEntrada[i][0] === hojayCopade.HojadeEntrada[k][0]) {
+                    importe = importe + hojayCopade.HojadeEntrada[k][1];
+                    suma = suma + 1;
+                    hojayCopade.HojadeEntrada[k][1] = 0;
+                }
+            }
+            if (importe !== 0) {
+                ArrayEntrada.push([hojayCopade.HojadeEntrada[i][0], importe, suma]);
+            }
+        }
+        for (var i5 = 0; i5 < hojayCopade.COPADE.length; i5++){
+            var importeCopade = 0;
+            var sumaCopade = 0;
+            for (var k5 = i5; k5 < hojayCopade.COPADE.length; k5++) {
+                if (hojayCopade.COPADE[i5][0] === hojayCopade.COPADE[k5][0]) {
+                    importeCopade = importeCopade + hojayCopade.COPADE[k5][1];
+                    sumaCopade = sumaCopade + 1;
+                    hojayCopade.COPADE[k5][1] = 0;
+                }
+            }
+            if (importeCopade !== 0) {
+                ArrayCopade.push([hojayCopade.COPADE[i5][0], importeCopade, sumaCopade]);
+            }
+        }
+        copadeTotal.push('Total general');
+        for (var k2 = 0; k2 < ArrayCopade.length; k2++) {
+            sumaImporteCopade = sumaImporteCopade + ArrayCopade[k2][1];
+            sumaContadorCopade = sumaContadorCopade + ArrayCopade[k2][2];
+        }
+        copadeTotal.push(sumaImporteCopade);
+        copadeTotal.push(sumaContadorCopade);
+
+        entradaTotal.push('Total general');
+        for (var k3 = 0; k3 < ArrayEntrada.length; k3++) {
+            sumaImporteEntrada = sumaImporteEntrada + ArrayEntrada[k3][1];
+            sumaContadorEntrada = sumaContadorEntrada + ArrayEntrada[k3][2];
+        }
+        entradaTotal.push(sumaImporteEntrada);
+        entradaTotal.push(sumaContadorEntrada);
         for (j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
             a_AA = a_AA + authorized.AA[j];
             a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
@@ -773,26 +968,26 @@ exports.getPresentation = async (req, res, next) => {
             adecTableSuma = adecTableSuma + adecChart[j];
             adecChart[j] = numeral(adecChart[j]).divide(1000000).format('0');
         }
-        for (i = 0; i < exercise.length; i++) {
-            realChart[i] = exercise[i].AA + exercise[i].CGDUOS + exercise[i].GMDE + exercise[i].GMGE + exercise[i].GMM + exercise[i].GMOPI +
-            exercise[i].CSTPIP + exercise[i].GSMCCIT + exercise[i].GSSLT + exercise[i].GMSSTPA;
-            realTableSuma = realTableSuma + realChart[i];
-            realChart[i] = numeral(realChart[i]).divide(1000000).format('0');
-            realTable[i] = realChart[i];
-            adecSumaAvance = adecSumaAvance + parseFloat(adecChart[i]);
-            e_AA = e_AA + exercise[i].AA;
-            e_CGDUOS = e_CGDUOS+ exercise[i].CGDUOS;
-            e_GMDE = e_GMDE + exercise[i].GMDE;
-            e_GMGE = e_GMGE + exercise[i].GMGE;
-            e_GMM = e_GMM + exercise[i].GMM;
-            e_GMOPI = e_GMOPI + exercise[i].GMOPI;
-            e_CSTPIP = e_CSTPIP + exercise[i].CSTPIP;
-            e_GSMCCIT = e_GSMCCIT + exercise[i].GSMCCIT;
-            e_GSSLT = e_GSSLT + exercise[i].GSSLT;
-            e_GMSSTPA = e_GMSSTPA + exercise[i].GMSSTPA;
+        for (var i3 = 0; i3 < exercise.length; i3++) {
+            realChart[i3] = exercise[i3].AA + exercise[i3].CGDUOS + exercise[i3].GMDE + exercise[i3].GMGE + exercise[i3].GMM + exercise[i3].GMOPI +
+            exercise[i3].CSTPIP + exercise[i3].GSMCCIT + exercise[i3].GSSLT + exercise[i3].GMSSTPA;
+            realTableSuma = realTableSuma + realChart[i3];
+            realChart[i3] = numeral(realChart[i3]).divide(1000000).format('0');
+            realTable[i3] = realChart[i3];
+            adecSumaAvance = adecSumaAvance + parseFloat(adecChart[i3]);
+            e_AA = e_AA + exercise[i3].AA;
+            e_CGDUOS = e_CGDUOS+ exercise[i3].CGDUOS;
+            e_GMDE = e_GMDE + exercise[i3].GMDE;
+            e_GMGE = e_GMGE + exercise[i3].GMGE;
+            e_GMM = e_GMM + exercise[i3].GMM;
+            e_GMOPI = e_GMOPI + exercise[i3].GMOPI;
+            e_CSTPIP = e_CSTPIP + exercise[i3].CSTPIP;
+            e_GSMCCIT = e_GSMCCIT + exercise[i3].GSMCCIT;
+            e_GSSLT = e_GSSLT + exercise[i3].GSSLT;
+            e_GMSSTPA = e_GMSSTPA + exercise[i3].GMSSTPA;
         }
         realTableSuma =  numeral(realTableSuma).divide(1000000).format('0');
-        for (i=realTable.length; i<12; i++){
+        for (var i4=realTable.length; i4<12; i4++){
             realTable.push('');
         }
         adecTableSuma =  numeral(adecTableSuma).divide(1000000).format('0');
@@ -959,11 +1154,51 @@ exports.getPresentation = async (req, res, next) => {
         slide3.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
         // Slide 4
         let slide4 = pres.addSlide();
+   
+        var arrDataLineStat2 = [];
+        var tmpObjRed1 = { name:'Ejercicio', labels:dias, values:totalEjercicio};
+        arrDataLineStat2.push( tmpObjRed1 );
+        var optsChartLine3 = {
+            x:0.5,
+            y:1.2,
+            w:9.0,
+            h:5.2,
+            catAxisLabelFontBold: true,
+            catAxisLabelFontFace: 'Montserrat SemiBold',
+            catAxisLabelFontSize: 12,
+            chartColors: [ '41955B'],
+            lineSize  : 3,
+            lineSmooth: false,
+            showLegend: false,
+            legendPos: 't',
+            legendFontSize:20,
+            legendFontFace:'Montserrat SemiBold',
+            lineDataSymbol: 'diamond',
+            lineDataSymbolSize: 12,
+            showValue:false,
+            legendColor: '000000',
+            valAxisHidden:true,
+            catAxisLabelPos: 'high',
+            valGridLine: {style: 'none'},
+            dataLabelFontBold: true,
+            dataLabelFontSize: 14,
+            dataLabelPosition: 't'
+        };
+        var TablaDiapositiva4 = [];
+        var Cabezera = [{text: 'Periodo', options: {bold: true, color:'FFFFFF', fill:'42955B', fontSize: 12}},{text: 'Adec II', options:
+             {bold: true,fill:'42955B', color:'FFFFFF', fontSize: 12}}, {text: 'Ejer', options: {bold: true, fill:'42955B',color:'FFFFFF', fontSize: 12}}, {text: '%', options: {bold: true, fill:'42955B',color:'FFFFFF', fontSize: 12}} ];
+        var Datos = [{text: `${mesInicial} - ${mesFinal}`, options:{bold:true, fill:'CFDDD2', color:'000000', fontSize: 12}}, {text: `${tableInversion[1]}`, options:{bold:true, fill:'CFDDD2',color:'000000', fontSize: 12}}, {text: `${tableInversion[2]}`, options:{bold:true,fill:'CFDDD2', color:'000000', fontSize: 12}}, {text: `${tableInversion[4]}`, options:{bold:true, color:'000000', fill:'CFDDD2',fontSize: 12}}];
+        TablaDiapositiva4.push(Cabezera);
+        TablaDiapositiva4.push(Datos);
         slide4.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
         slide4.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
         slide4.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
         slide4.addText(`Ejercicio presupuestal ${mesInicial} - ${mesFinal} ${ano}`, { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
+        slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
+        //slide4.addTable(TablaDiapositiva4, {x:5.5, y:5.3, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
         slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
+
+
         // Slide 5
         let diapositiva5 = pres.addSlide();
         var colorAA;
@@ -1079,30 +1314,26 @@ var HojadeEntradaTable = [];
 HojadeEntradaTable.push(['ACREEDOR', 'IMPORTE', 'HOJA DE ENTRADA']);
 COPADETable = [];
 COPADETable.push(['ACREEDOR', 'IMPORTE', 'COPADES']);
-var ArrayEntrada =  [
-    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
-    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
-    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
-    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10'],
-    ['ACT ENERGY MEXICO S.A. DE C.V.', '123456','10']
-];
 
 var backgroundcolor;
-for (i=0; i <ArrayEntrada.length; i++) {
-(i%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
+for (var i1=0; i1 <ArrayEntrada.length; i1++) {
+(i1%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
 HojadeEntradaTable.push([
-    { text: ArrayEntrada[i][0], options: {color: '000000', fill: backgroundcolor} },
-    { text: ArrayEntrada[i][1], options: {color: '000000', fill: backgroundcolor}},
-    { text: ArrayEntrada[i][2], options: {color: '000000', fill: backgroundcolor}}
-]);
-COPADETable.push([
-    { text: ArrayEntrada[i][0], options: {color: '000000', fill: backgroundcolor} },
-    { text: ArrayEntrada[i][1], options: {color: '000000', fill: backgroundcolor}},
-    { text: ArrayEntrada[i][2], options: {color: '000000', fill: backgroundcolor}}
+    { text: ArrayEntrada[i1][0], options: {color: '000000', fill: backgroundcolor} },
+    { text: numeral(ArrayEntrada[i1][1]).format('$0,0.00'), options: {color: '000000', fill: backgroundcolor}},
+    { text: ArrayEntrada[i1][2], options: {color: '000000', fill: backgroundcolor}}
 ]);
 }
-HojadeEntradaTable.push(['Total general','123456','30']);
-COPADETable.push(['Total general','123456','30']);
+for (var i9=0; i9 <ArrayCopade.length; i9++) {
+    (i9%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
+    COPADETable.push([
+        { text: ArrayCopade[i9][0], options: { color: '000000', fill: backgroundcolor} },
+        { text: numeral(ArrayCopade[i9][1]).format('$0,0.00'), options: {color: '000000', fill: backgroundcolor}},
+        { text: ArrayCopade[i9][2], options: {color: '000000', fill: backgroundcolor}}
+    ]);
+}
+HojadeEntradaTable.push([entradaTotal[0], numeral(entradaTotal[1]).format('$0,0.00'), entradaTotal[2]]);
+COPADETable.push([copadeTotal[0], numeral(copadeTotal[1]).format('$0,0.00'), copadeTotal[2]]);
 
 let diapositiva6 = pres.addSlide();
 diapositiva6.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
@@ -1112,14 +1343,14 @@ diapositiva6.addText('Recepcionado', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.
 diapositiva6.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 diapositiva6.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
 diapositiva6.addText('Hoja de entrada', { x: 1.4, y: 1.52, w: 2.3, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
-diapositiva6.addTable(HojadeEntradaTable, { x: 1.4, y: 1.9, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', border: {color: 'ffffff', pt:1}});
+diapositiva6.addTable(HojadeEntradaTable, { x: 1.4, y: 1.9, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center',colW: [3.5,2,2], border: {color: 'ffffff', pt:1}});
 diapositiva6.addText('COPADES', { x: 1.4, y: 4.04, w: 1.43, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
-diapositiva6.addTable(COPADETable, { x: 1.4, y: 4.55, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', border: {color: 'ffffff', pt:1}});
+diapositiva6.addTable(COPADETable, { x: 1.4, y: 4.55, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', colW: [3.5,2,2], border: {color: 'ffffff', pt:1}});
 diapositiva6.addText(`Fecha de extracción: ${dia} de ${mes} de ${ano}`, { x: 0.16, y: 7, w: 3, h:0.27, color: '000000', align: 'center', fontFace:'Arial', fontSize: 10, bold:false});
 // Slide 7
 let slide7 = pres.addSlide();
 slide7.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
-slide7.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: "000000", align: "right", fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
+slide7.addText(`Presupuesto de Inversión ${ano}`, { x: 0.21, y: 0.06, w: 7.8, h:0.59, color: '000000', align: 'right', fontFace:'Montserrat SemiBold', fontSize: 19.2, bold:true});
 slide7.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
 slide7.addText('Comentarios', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
 slide7.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
@@ -1171,6 +1402,26 @@ pres.writeFile(filename)
         //     tableTotalInversionRecepcionado
         // });
     } catch (err) {
+        console.log(err);
+        next(err);
+    }
+};
+
+exports.postExerciseChart = async (req, res, next) => {
+    if (!req.body.exerciseDate || !req.body.exerciseTotal){
+        return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
+    }
+    var user = req.user;
+    var exerciseDate = new Date(req.body.exerciseDate);
+    var exerciseTotal = req.body.exerciseTotal;
+    try {
+        var chart = await exerciseChart.create({createdBy: user, createdAt: Date.now(), exerciseDate, exerciseTotal});
+        res.status(201).json({
+            status: 'Created',
+            chart
+        });
+    }
+    catch (err) {
         console.log(err);
         next(err);
     }

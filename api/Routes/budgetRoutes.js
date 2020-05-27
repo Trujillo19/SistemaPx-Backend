@@ -22,7 +22,10 @@ router.get('/', budgetController.getBudget);
 router.get('/pptx', budgetController.getPresentation);
 router.post('/authorized', upload.single('autorizado'), budgetController.postAuthorized);
 router.post('/exercised', upload.single('ejercicio'), budgetController.postExercised);
+router.post('/copades', upload.single('copades'), budgetController.postCopades);
 router.post('/received', upload.single('received'), budgetController.postReceived);
+router.post('/exercisechart', budgetController.postExerciseChart);
+
 
 module.exports = router;
 
