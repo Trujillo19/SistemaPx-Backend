@@ -10,7 +10,7 @@ const cors = require('cors');
 // Route declaration
 const userRoutes = require('./api/Routes/userRoutes');
 const budgetRoutes = require('./api/Routes/budgetRoutes');
-const helperRoutes = require('./api/Routes/helperRoutes');
+const pptxRoutes = require('./api/Routes/pptxRoutes');
 
 // Error handler
 const globalErrHandler = require('./api/Controllers/errorController');
@@ -43,7 +43,7 @@ app.use(hpp());
 // Routes
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budget', budgetRoutes);
-app.use('/api/v1/helpers', helperRoutes);
+app.use('/api/v1/pptx', pptxRoutes);
 
 // Handler for undefined routes
 app.use('*', (req,res,next) => {

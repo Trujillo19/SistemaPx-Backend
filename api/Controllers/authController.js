@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const saltRound = 10;
 const User = require('../Models/userModel');
 const AppError = require('../Helpers/appError');
-const mailSender = require('../Helpers/mailSender');
 
 
 // Token creation function
@@ -38,20 +37,11 @@ exports.signup = async (req, res, next) => {
             password: hashedPassword,
             role
         });
-        console.log(email);
-        // const msg = {
-        //     to: email,
-        //     from: 'angeeltrujillo@gmail.com',
-        //     subject: 'Sending with Twilio SendGrid is Fun',
-        //     text: 'and easy to do anywhere, even with Node.js',
-        //     html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-        // };
         // Token creation
         const token = createToken(user._id);
         // Delete password from the response
         user.password = undefined;
         // Send response and token
-        // mailSender.sendMessage(msg);
         return res.status(201).json({
             status: 'Success',
             token,
@@ -65,7 +55,7 @@ exports.signup = async (req, res, next) => {
             return next(new AppError(400, 'Bad Request', err.message));
         }
         if (err.name === 'MongoError' && err.code === 11000) {
-            return next(new AppError(400, 'Bad Request', 'Email already exist'));
+            return next(new AppError(400, 'Bad Request', 'Ya existe una cuenta con ese correo electrónico.'));
         }
         return next(err);
     }
@@ -83,12 +73,15 @@ exports.login = async (req, res, next) => {
         const user = await User.findOne({email});
         // If there is'nt an email, send Unauthorized, don't send too much information.
         if (!user) {
-            return next(new AppError(401, 'Unauthorized', 'Email doesn\'t exist or password doesn\'t match'));
+            return next(new AppError(401, 'Unauthorized', 'Usuario inexistente o contraseña incorrecta.'));
         }
         const comparedPassword = await bcrypt.compare(password, user.password);
         // If password doesn't match, send Unauthorized, don't send too much information.
         if (!comparedPassword) {
-            return next(new AppError(401, 'Unauthorized', 'Email doesn\'t exist or password doesn\'t match'));
+            return next(new AppError(401, 'Unauthorized', 'Usuario inexistente o contraseña incorrecta.'));
+        }
+        if (!user.verified) {
+            return next(new AppError(401, 'Unauthorized', 'Usuario no verificado. Contacta al administrador.'));
         }
         // If password match, create a token
         const token = createToken(user._id);
@@ -121,14 +114,14 @@ exports.protect = async (req, res, next) => {
         }
         // If it's not, send Unauthorized.
         if (!token) {
-            return next(new AppError(401, 'Unauthorized', 'You are not logged in. Please login in to continue'), req, res, next);
+            return next(new AppError(401, 'Unauthorized', 'No ha iniciado sesión. Inicie sesión para continuar.'), req, res, next);
         }
         const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
         // Check if the User exists.
         const user = await User.findById(decode.id);
         if (!user) {
-            return next(new AppError(401, 'Unauthorized', 'This user no longer exist'), req, res, next);
+            return next(new AppError(401, 'Unauthorized', 'Este usuario ya no existe.'), req, res, next);
         }
         req.user = user.id;
         next();

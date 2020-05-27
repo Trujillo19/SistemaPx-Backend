@@ -13,7 +13,8 @@ const newAuthorizedBudgetModel = new mongoose.Schema({
     },
     authName: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     AA: {
         type: [Number],
@@ -61,5 +62,5 @@ newAuthorizedBudgetModel.pre('save', async (next) => {
     return next();
 });
 
-const newAuthorizedBudget = mongoose.model('newAuthorizedBudget', newAuthorizedBudgetModel);
+const newAuthorizedBudget = mongoose.model('AuthorizedBudget', newAuthorizedBudgetModel);
 module.exports = newAuthorizedBudget;

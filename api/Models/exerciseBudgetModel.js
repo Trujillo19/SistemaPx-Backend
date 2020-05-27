@@ -61,5 +61,5 @@ newExercisedBudgetModel.pre('save', async (next) => {
     return next();
 });
 
-const newExercisedBudget = mongoose.model('newExercisedBudget', newExercisedBudgetModel);
+const newExercisedBudget = mongoose.model('exercisedBudget', newExercisedBudgetModel);
 module.exports = newExercisedBudget;
