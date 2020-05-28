@@ -1,91 +1,30 @@
+const authorizedBudget = require('../Models/authorizedBudgetModel');
+const exercisedBudget = require('../Models/exerciseBudgetModel');
+const receivedBudget = require('../Models/receivedBudgetModel');
+const exerciseChart = require('../Models/exerciseChartModel');
+const HojaCopade = require('../Models/HojaCopadeModel');
+const AppError = require('../Helpers/appError');
+const numeral = require('../Helpers/numeral');
+const pptxgen = require('pptxgenjs');
 
 exports.getPptx = async (req, res, next) => {
+    // Si no existen los campos necesarios, envía un error 400.
     if (!req.query.startDate || !req.query.endDate || !req.query.authName){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
     }
-    var mesInicial;
-    var mesFinal;
-    var anoSlide4 = ['Enero','Febrero','Marzo','Abril', 'Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    // Variables de la petición
     const startDate = new Date(req.query.startDate+ 'GMT-0600');
     const endDate = new Date(req.query.endDate+ 'GMT-0600');
+    const authName = req.query.authName;
     var monthDiff = endDate.getMonth() - startDate.getMonth();
-    switch (startDate.getMonth()) {
-        case 0:
-            mesInicial = 'enero';
-            break;
-        case 1:
-            mesInicial = 'febrero';
-            break;
-        case 2:
-            mesInicial = 'marzo';
-            break;
-        case 3:
-            mesInicial = 'abril';
-            break;
-        case 4:
-            mesInicial = 'mayo';
-            break;
-        case 5:
-            mesInicial = 'junio';
-            break;
-        case 6:
-            mesInicial = 'julio';
-            break;
-        case 7:
-            mesInicial = 'agosto';
-            break;
-        case 8:
-            mesInicial = 'septiembre';
-            break;
-        case 9:
-            mesInicial = 'octubre';
-            break;
-        case 10:
-            mesInicial = 'noviembre';
-            break;
-        case 11:
-            mesInicial = 'diciembre';
-            break;
+    // Si la fecha inicial es antes que la fecha de final, enviar un error 400.
+    if (endDate - startDate < 0 ) {
+        return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
     }
-    switch (endDate.getMonth()) {
-        case 0:
-            mesFinal = 'enero';
-            break;
-        case 1:
-            mesFinal = 'febrero';
-            break;
-        case 2:
-            mesFinal = 'marzo';
-            break;
-        case 3:
-            mesFinal = 'abril';
-            break;
-        case 4:
-            mesFinal = 'mayo';
-            break;
-        case 5:
-            mesFinal = 'junio';
-            break;
-        case 6:
-            mesFinal = 'julio';
-            break;
-        case 7:
-            mesFinal = 'agosto';
-            break;
-        case 8:
-            mesFinal = 'septiembre';
-            break;
-        case 9:
-            mesFinal = 'octubre';
-            break;
-        case 10:
-            mesFinal = 'noviembre';
-            break;
-        case 11:
-            mesFinal = 'diciembre';
-            break;
-    }
-    // New vars
+    // Variables para guardar el mesInicial y mesFinal
+    var mesInicial;
+    var mesFinal;
+    // Variables para la Diapositiva 1.
     var realChart = [];
     var adecChart = [];
     var realTable = [];
@@ -140,75 +79,160 @@ exports.getPptx = async (req, res, next) => {
     var a_GSMCCIT = 0;
     var a_GSSLT = 0;
     var a_GMSSTPA = 0;
-    const authName = req.query.authName;
     var dias = [];
     var totalEjercicio = [];
-    if (endDate - startDate < 0 ) {
-        return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
+    // Otras variables
+    var ArrayEntrada = [];
+    var ArrayCopade = [];
+    var entradaTotal = [];
+    var sumaImporteEntrada = 0;
+    var sumaContadorEntrada = 0;
+    var copadeTotal = [];
+    var sumaImporteCopade = 0;
+    var sumaContadorCopade = 0;
+    var anoSlide4 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    // Switch para darle nombre a cada mes
+    switch (startDate.getMonth()) {
+        case 0:
+            mesInicial = 'enero';
+            break;
+        case 1:
+            mesInicial = 'febrero';
+            break;
+        case 2:
+            mesInicial = 'marzo';
+            break;
+        case 3:
+            mesInicial = 'abril';
+            break;
+        case 4:
+            mesInicial = 'mayo';
+            break;
+        case 5:
+            mesInicial = 'junio';
+            break;
+        case 6:
+            mesInicial = 'julio';
+            break;
+        case 7:
+            mesInicial = 'agosto';
+            break;
+        case 8:
+            mesInicial = 'septiembre';
+            break;
+        case 9:
+            mesInicial = 'octubre';
+            break;
+        case 10:
+            mesInicial = 'noviembre';
+            break;
+        case 11:
+            mesInicial = 'diciembre';
+            break;
     }
+    // Switch para darle nombre a cada mes
+    switch (endDate.getMonth()) {
+        case 0:
+            mesFinal = 'enero';
+            break;
+        case 1:
+            mesFinal = 'febrero';
+            break;
+        case 2:
+            mesFinal = 'marzo';
+            break;
+        case 3:
+            mesFinal = 'abril';
+            break;
+        case 4:
+            mesFinal = 'mayo';
+            break;
+        case 5:
+            mesFinal = 'junio';
+            break;
+        case 6:
+            mesFinal = 'julio';
+            break;
+        case 7:
+            mesFinal = 'agosto';
+            break;
+        case 8:
+            mesFinal = 'septiembre';
+            break;
+        case 9:
+            mesFinal = 'octubre';
+            break;
+        case 10:
+            mesFinal = 'noviembre';
+            break;
+        case 11:
+            mesFinal = 'diciembre';
+            break;
+    }
+    // Bloque Try - Catch
     try {
-        var hojayCopade = await HojaCopade.findOne().sort({createdAt: -1});
+        // Busca en la base de datos el autorizado solicitado en la petición
         var authorized = await authorizedBudget.findOne({authName});
+        // Busca en la base de datos los ejercicios solicitados en la petición
         var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
+        // Busca en la base de datos el último HojaCopade
+        var hojayCopade = await HojaCopade.findOne().sort({createdAt: -1});
         var received = await receivedBudget.findOne().sort({receivedDate: -1});
         var exerciseChartRes = await exerciseChart.find();
-        for (var k77 = 0; k77 < exerciseChartRes.length; k77++) {
-            dias.push(exerciseChartRes[k77].exerciseDate.toISOString().split('T')[0]);
-            totalEjercicio.push(exerciseChartRes[k77].exerciseTotal);
+        if (hojayCopade === null || authorized === null || exercise.length === 0
+            || received === null || exerciseChartRes === null) {
+            return next(new AppError(400, 'Not found', 'Faltan archivos para generar la presentación'));
+        }
+        for (let i = 0; i < exerciseChartRes.length; i++) {
+            dias.push(exerciseChartRes[i].exerciseDate.toISOString().split('T')[0]);
+            totalEjercicio.push(exerciseChartRes[i].exerciseTotal);
         }
 
-        var ArrayEntrada = [];
-        var ArrayCopade = [];
-        var entradaTotal = [];
-        var sumaImporteEntrada = 0;
-        var sumaContadorEntrada = 0;
-        var copadeTotal = [];
-        var sumaImporteCopade = 0;
-        var sumaContadorCopade = 0;
-        for (var i = 0; i < hojayCopade.HojadeEntrada.length; i++){
+
+        for (let i = 0; i < hojayCopade.HojadeEntrada.length; i++){
             var importe = 0;
             var suma = 0;
-            for (var k = i; k < hojayCopade.HojadeEntrada.length; k++) {
-                if (hojayCopade.HojadeEntrada[i][0] === hojayCopade.HojadeEntrada[k][0]) {
-                    importe = importe + hojayCopade.HojadeEntrada[k][1];
+            for (let j = i; j < hojayCopade.HojadeEntrada.length; j++) {
+                if (hojayCopade.HojadeEntrada[i][0] === hojayCopade.HojadeEntrada[j][0]) {
+                    importe = importe + hojayCopade.HojadeEntrada[j][1];
                     suma = suma + 1;
-                    hojayCopade.HojadeEntrada[k][1] = 0;
+                    hojayCopade.HojadeEntrada[j][1] = 0;
                 }
             }
             if (importe !== 0) {
                 ArrayEntrada.push([hojayCopade.HojadeEntrada[i][0], importe, suma]);
             }
         }
-        for (var i5 = 0; i5 < hojayCopade.COPADE.length; i5++){
+        for (let i = 0; i < hojayCopade.COPADE.length; i++){
             var importeCopade = 0;
             var sumaCopade = 0;
-            for (var k5 = i5; k5 < hojayCopade.COPADE.length; k5++) {
-                if (hojayCopade.COPADE[i5][0] === hojayCopade.COPADE[k5][0]) {
-                    importeCopade = importeCopade + hojayCopade.COPADE[k5][1];
+            for (let j = i; j < hojayCopade.COPADE.length; j++) {
+                if (hojayCopade.COPADE[i][0] === hojayCopade.COPADE[j][0]) {
+                    importeCopade = importeCopade + hojayCopade.COPADE[j][1];
                     sumaCopade = sumaCopade + 1;
-                    hojayCopade.COPADE[k5][1] = 0;
+                    hojayCopade.COPADE[j][1] = 0;
                 }
             }
             if (importeCopade !== 0) {
-                ArrayCopade.push([hojayCopade.COPADE[i5][0], importeCopade, sumaCopade]);
+                ArrayCopade.push([hojayCopade.COPADE[i][0], importeCopade, sumaCopade]);
             }
         }
         copadeTotal.push('Total general');
-        for (var k2 = 0; k2 < ArrayCopade.length; k2++) {
-            sumaImporteCopade = sumaImporteCopade + ArrayCopade[k2][1];
-            sumaContadorCopade = sumaContadorCopade + ArrayCopade[k2][2];
+        for (let i = 0; i < ArrayCopade.length; i++) {
+            sumaImporteCopade = sumaImporteCopade + ArrayCopade[i][1];
+            sumaContadorCopade = sumaContadorCopade + ArrayCopade[i][2];
         }
         copadeTotal.push(sumaImporteCopade);
         copadeTotal.push(sumaContadorCopade);
 
         entradaTotal.push('Total general');
-        for (var k3 = 0; k3 < ArrayEntrada.length; k3++) {
-            sumaImporteEntrada = sumaImporteEntrada + ArrayEntrada[k3][1];
-            sumaContadorEntrada = sumaContadorEntrada + ArrayEntrada[k3][2];
+        for (let i = 0; i < ArrayEntrada.length; i++) {
+            sumaImporteEntrada = sumaImporteEntrada + ArrayEntrada[i][1];
+            sumaContadorEntrada = sumaContadorEntrada + ArrayEntrada[i][2];
         }
         entradaTotal.push(sumaImporteEntrada);
         entradaTotal.push(sumaContadorEntrada);
-        for (j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
+        for (let j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
             a_AA = a_AA + authorized.AA[j];
             a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
             a_GMDE = a_GMDE + authorized.GMDE[j];
@@ -223,32 +247,32 @@ exports.getPptx = async (req, res, next) => {
         if (exercise.length === 0){
             return next(new AppError(404, 'Not found', 'There isn\'t data from the selected period'));
         }
-        for (j = 0; j <= 11; j++){
+        for (let j = 0; j <= 11; j++){
             adecChart[j] = authorized.AA[j] + authorized.CGDUOS[j] + authorized.GMDE[j] + authorized.GMGE[j] +
             authorized.GMM[j] + authorized.GMOPI[j] + authorized.CSTPIP[j] + authorized.GSMCCIT[j]+ authorized.GSSLT[j] + authorized.GMSSTPA[j];
             adecTableSuma = adecTableSuma + adecChart[j];
             adecChart[j] = numeral(adecChart[j]).divide(1000000).format('0');
         }
-        for (var i3 = 0; i3 < exercise.length; i3++) {
-            realChart[i3] = exercise[i3].AA + exercise[i3].CGDUOS + exercise[i3].GMDE + exercise[i3].GMGE + exercise[i3].GMM + exercise[i3].GMOPI +
-            exercise[i3].CSTPIP + exercise[i3].GSMCCIT + exercise[i3].GSSLT + exercise[i3].GMSSTPA;
-            realTableSuma = realTableSuma + realChart[i3];
-            realChart[i3] = numeral(realChart[i3]).divide(1000000).format('0');
-            realTable[i3] = realChart[i3];
-            adecSumaAvance = adecSumaAvance + parseFloat(adecChart[i3]);
-            e_AA = e_AA + exercise[i3].AA;
-            e_CGDUOS = e_CGDUOS+ exercise[i3].CGDUOS;
-            e_GMDE = e_GMDE + exercise[i3].GMDE;
-            e_GMGE = e_GMGE + exercise[i3].GMGE;
-            e_GMM = e_GMM + exercise[i3].GMM;
-            e_GMOPI = e_GMOPI + exercise[i3].GMOPI;
-            e_CSTPIP = e_CSTPIP + exercise[i3].CSTPIP;
-            e_GSMCCIT = e_GSMCCIT + exercise[i3].GSMCCIT;
-            e_GSSLT = e_GSSLT + exercise[i3].GSSLT;
-            e_GMSSTPA = e_GMSSTPA + exercise[i3].GMSSTPA;
+        for (let i = 0; i < exercise.length; i++) {
+            realChart[i] = exercise[i].AA + exercise[i].CGDUOS + exercise[i].GMDE + exercise[i].GMGE + exercise[i].GMM + exercise[i].GMOPI +
+            exercise[i].CSTPIP + exercise[i].GSMCCIT + exercise[i].GSSLT + exercise[i].GMSSTPA;
+            realTableSuma = realTableSuma + realChart[i];
+            realChart[i] = numeral(realChart[i]).divide(1000000).format('0');
+            realTable[i] = realChart[i];
+            adecSumaAvance = adecSumaAvance + parseFloat(adecChart[i]);
+            e_AA = e_AA + exercise[i].AA;
+            e_CGDUOS = e_CGDUOS+ exercise[i].CGDUOS;
+            e_GMDE = e_GMDE + exercise[i].GMDE;
+            e_GMGE = e_GMGE + exercise[i].GMGE;
+            e_GMM = e_GMM + exercise[i].GMM;
+            e_GMOPI = e_GMOPI + exercise[i].GMOPI;
+            e_CSTPIP = e_CSTPIP + exercise[i].CSTPIP;
+            e_GSMCCIT = e_GSMCCIT + exercise[i].GSMCCIT;
+            e_GSSLT = e_GSSLT + exercise[i].GSSLT;
+            e_GMSSTPA = e_GMSSTPA + exercise[i].GMSSTPA;
         }
         realTableSuma =  numeral(realTableSuma).divide(1000000).format('0');
-        for (var i4=realTable.length; i4<12; i4++){
+        for (let i=realTable.length; i<12; i++){
             realTable.push('');
         }
         adecTableSuma =  numeral(adecTableSuma).divide(1000000).format('0');
@@ -323,7 +347,7 @@ exports.getPptx = async (req, res, next) => {
         tableTotalInversionRecepcionado = [numeral(recepcionadoTotal).divide(1000000).format('0.0'), numeral(recepcionadoTotal + e_Total).divide(1000000).format('0.0'),  numeral((recepcionadoTotal + e_Total) - a_Total).divide(1000000).format('0.0'), numeral(avanceEsperadoTotal ? avanceEsperadoTotal : 0).format('0%') ];
         let pres = new pptxgen();
         pres.layout = 'LAYOUT_4x3';
-        var today = new Date();
+        var today = exercise[exercise.length-1].createdAt;
         var dia = today.getDate();
         var mes;
         switch (today.getMonth()) {
@@ -347,7 +371,7 @@ exports.getPptx = async (req, res, next) => {
                 break;
         }
         var ano = today.getFullYear();
-        var filename = `Estado actual ppto-${dia}-${mes}-${ano}`;
+        var filename = `Estado-actual-ppto-${dia}-${mes}-${ano}`;
         // Slide 1
         let slide1 = pres.addSlide();
         slide1.addImage({ path:'./fondo-recortado.png', x:0, y:0, w:10.0, h:7.5 });
@@ -364,6 +388,7 @@ exports.getPptx = async (req, res, next) => {
         slide2.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
         slide2.addText('PRESUPUESTO DE INVERSIÓN', { x: 2.13, y: 2.58, w:7.54, h:1.12, color: 'B38E5D', align: 'right', fontFace:'Montserrat Regular', fontSize: 21, bold: true});
         slide2.addShape(pres.shapes.LINE,      { x:2.13, y:4, w:7.54, h:0.0, line:'B38E5D', lineSize:4 });
+        slide2.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
         // Slide 3
         let slide3 = pres.addSlide();
         var Meses = ['Ene','Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul','Ago','Sep', 'Oct','Nov','Dic'];
@@ -466,7 +491,7 @@ exports.getPptx = async (req, res, next) => {
             x2 =x2+1.63;
         }
         slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
-        //slide4.addTable(TablaDiapositiva4, {x:5.5, y:5.3, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
+        slide4.addTable(TablaDiapositiva4, {x:5.2, y:4.64, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
         slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 
 
@@ -595,12 +620,12 @@ HojadeEntradaTable.push([
     { text: ArrayEntrada[i1][2], options: {color: '000000', fill: backgroundcolor}}
 ]);
 }
-for (var i9=0; i9 <ArrayCopade.length; i9++) {
-    (i9%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
+for (let i=0; i <ArrayCopade.length; i++) {
+    (i%2===0) ? backgroundcolor = 'E6B8B7' : backgroundcolor = 'F2DCDB';
     COPADETable.push([
-        { text: ArrayCopade[i9][0], options: { color: '000000', fill: backgroundcolor} },
-        { text: numeral(ArrayCopade[i9][1]).format('$0,0.00'), options: {color: '000000', fill: backgroundcolor}},
-        { text: ArrayCopade[i9][2], options: {color: '000000', fill: backgroundcolor}}
+        { text: ArrayCopade[i][0], options: { color: '000000', fill: backgroundcolor} },
+        { text: numeral(ArrayCopade[i][1]).format('$0,0.00'), options: {color: '000000', fill: backgroundcolor}},
+        { text: ArrayCopade[i][2], options: {color: '000000', fill: backgroundcolor}}
     ]);
 }
 HojadeEntradaTable.push([entradaTotal[0], numeral(entradaTotal[1]).format('$0,0.00'), entradaTotal[2]]);
@@ -626,52 +651,10 @@ slide7.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54});
 slide7.addText('Comentarios', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
 slide7.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 // Write the file
-pres.writeFile(filename)
+pres.writeFile(`./downloads/${filename}`)
 .then(filename => {
     res.download(`./${filename}`);
 });
-
-
-        // res.status(200).json({
-        //     status: 'Success',
-        //     mesInicial,
-        //     mesFinal,
-        //     realChart,
-        //     adecChart,
-        //     realTable,
-        //     adecTableSuma,
-        //     realTableSuma,
-        //     dias,
-        //     totalEjercicio,
-        //     tableAA,
-        //     tableCGDUOS,
-        //     tableGMDE,
-        //     tableGMGE,
-        //     tableGMM,
-        //     tableGMOPI,
-        //     tableSPRN,
-        //     tableCSTPIP,
-        //     tableGSMCCIT,
-        //     tableGSSLT,
-        //     tableSASEP,
-        //     tableGMSSTPA,
-        //     tableSSSTPA,
-        //     tableInversion,
-        //     tableAARecepcionado,
-        //     tableCGDUOSRecepcionado,
-        //     tableGMDERecepcionado,
-        //     tableGMGERecepcionado,
-        //     tableGMMRecepcionado,
-        //     tableGMOPIRecepcionado,
-        //     tableSPRNRecepcionado,
-        //     tableCSTPIPRecepcionado,
-        //     tableGMCCITRecepcionado,
-        //     tableGSSLTRecepcionado,
-        //     tableSASEPRecepcionado,
-        //     tableGMSSTPARecepcionado,
-        //     tableSSSTPARecepcionado,
-        //     tableTotalInversionRecepcionado
-        // });
     } catch (err) {
         console.log(err);
         next(err);

@@ -13,7 +13,8 @@ const newExercisedBudgetModel = new mongoose.Schema({
     },
     exerciseDate: {
         type: Date,
-        required: true
+        required: true,
+        unique: true
     },
     AA: {
         type: Number,

@@ -6,7 +6,6 @@ const numeral = require('../Helpers/numeral');
 const Excel = require('exceljs');
 const sorter = require('../Helpers/sortExercise');
 const HojaCopade = require('../Models/HojaCopadeModel');
-const pptxgen = require('pptxgenjs');
 const exerciseChart = require('../Models/exerciseChartModel');
 const copadeBudget = require('../Models/CopadeBugdetModel');
 
@@ -489,7 +488,6 @@ exports.postExercised = async (req, res, next) => {
     var sheetName = req.body.sheetName;
     var filepath =  './' + req.file.path;
     var user = req.user;
-    var inputMonth = inputDate.getMonth() + 1;
     // Variables para almacenar el ejercicio por GM.
     var AA = 0;
     var CGDUOS = 0;
@@ -521,12 +519,7 @@ exports.postExercised = async (req, res, next) => {
             var worksheet = workbook.getWorksheet(sheetName);
             worksheet.eachRow((row,rowNumber) => {
                 // No hacer nada en la primera fila.
-                if (rowNumber !== 1){
-                    var documentMonth = parseInt(row.values[11],10);
-                    // Si el Periodo del Excel no coincide con el del request, envía un error 400.
-                    if (documentMonth !== inputMonth) {
-                        return next(new AppError(400, 'Bad Request', 'El periodo del documento no coincide con el periodo de entrada'));
-                    }
+                if (rowNumber !== 1) {
                     row.eachCell((cell) => {
                         // Guardar todos los valores de la fila en un Array
                         inputRow.push(cell.value);
@@ -571,6 +564,8 @@ exports.postExercised = async (req, res, next) => {
                 // Vaciar array
                 inputRow = [];
             });
+            // Checar si ya existe un ejercicio para ese mes, si hay, lo elimina.
+            await exercisedBudget.findOneAndDelete({exerciseDate: inputDate });
             // Guardar el ejercicio en la base de datos.
             var exercise = await exercisedBudget.create({createdBy: user, createdAt: Date.now(),
                 exerciseDate: inputDate, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
@@ -592,7 +587,7 @@ exports.postExercised = async (req, res, next) => {
             });
         }).catch((err) => {
             // Si hay algún error leyendo el archivo de Excel, se maneja aquí.
-            next(new AppError(500, 'Server error', err.message));
+            return next(new AppError(500, 'Server error', err.message));
         });
     }
     catch (err) {
@@ -894,6 +889,8 @@ exports.postExerciseChart = async (req, res, next) => {
     }
 };
 
+
+// Eliminar esta
 exports.getPresentation = async (req, res, next) => {
     if (!req.query.startDate || !req.query.endDate || !req.query.authName){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
