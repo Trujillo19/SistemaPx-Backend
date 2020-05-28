@@ -187,8 +187,6 @@ exports.getPptx = async (req, res, next) => {
             dias.push(exerciseChartRes[i].exerciseDate.toISOString().split('T')[0]);
             totalEjercicio.push(exerciseChartRes[i].exerciseTotal);
         }
-
-
         for (let i = 0; i < hojayCopade.HojadeEntrada.length; i++){
             var importe = 0;
             var suma = 0;
@@ -483,14 +481,17 @@ exports.getPptx = async (req, res, next) => {
         var x=1.07;
         var x2 = 1.05;
         var bgcolor;
+        var sumaSlide4= 0;
+        slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
         for(let i = 0; i <= monthDiff; i++) {
+            sumaSlide4 = sumaSlide4 + parseInt(realTable[i]);
             (i%2===0) ? bgcolor = 'E6B8B7' : bgcolor ='F2DCDB';
             slide4.addShape(pres.shapes.RECTANGLE,{ x:x2, y:1.7, w:1.63, h:3.64, fill:bgcolor });
             slide4.addText(anoSlide4[i], {x:x, y:1.66, w:2,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
+            slide4.addText(sumaSlide4, {x:x, y:3,w:0.8,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
             x = x+1.63;
             x2 =x2+1.63;
         }
-        slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
         slide4.addTable(TablaDiapositiva4, {x:5.2, y:4.64, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
         slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 
