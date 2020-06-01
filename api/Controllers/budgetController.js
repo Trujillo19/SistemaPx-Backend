@@ -90,10 +90,10 @@ exports.getBudget = async (req, res, next) => {
             a_GSSLT = a_GSSLT + authorized.GSSLT[j];
             a_GMSSTPA = a_GMSSTPA + authorized.GMSSTPA[j];
         }
+        // TODO: Fix this mess.
         // Obtiene la fecha del último ejercicio subido y lo simplifica a AAAA-MM-DD.
-        var lastExerciseDate = exercise[exercise.length - 1].createdAt.toISOString().split('T')[0];
         // Buscar en la base de datos el documento de pedidos con recepción del mismo día que el último ejercicio.
-        var received = await receivedBudget.findOne({receivedDate:lastExerciseDate});
+        var received = await receivedBudget.findOne().sort({receivedDate: -1});
         // El avance de cada GM, se divide el ejercicio entre el autorizado.
         var avanceAA = e_AA / a_AA;
         var avanceCGDUOS = e_CGDUOS / a_CGDUOS;
@@ -612,7 +612,7 @@ exports.postCopades = async (req, res, next) => {
     // Bloque Try - Catch.
     try {
         // Crea un nuevo libro de trabajo de Excel.
-        var workbook = new Excel.Workbook();+
+        var workbook = new Excel.Workbook(); +
         // Leer el archivo subido en la petición
         workbook.xlsx.readFile(filepath)
         .then(async () => {

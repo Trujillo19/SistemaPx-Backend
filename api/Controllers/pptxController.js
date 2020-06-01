@@ -178,7 +178,7 @@ exports.getPptx = async (req, res, next) => {
         // Busca en la base de datos el último HojaCopade
         var hojayCopade = await HojaCopade.findOne().sort({createdAt: -1});
         var received = await receivedBudget.findOne().sort({receivedDate: -1});
-        var exerciseChartRes = await exerciseChart.find();
+        var exerciseChartRes = await exerciseChart.find({exerciseDate: {$gte: startDate, $lte:endDate}});
         if (hojayCopade === null || authorized === null || exercise.length === 0
             || received === null || exerciseChartRes === null) {
             return next(new AppError(400, 'Not found', 'Faltan archivos para generar la presentación'));
@@ -483,6 +483,7 @@ exports.getPptx = async (req, res, next) => {
         var bgcolor;
         var sumaSlide4= 0;
         slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
+        console.log(monthDiff);
         for(let i = 0; i <= monthDiff; i++) {
             sumaSlide4 = sumaSlide4 + parseInt(realTable[i]);
             (i%2===0) ? bgcolor = 'E6B8B7' : bgcolor ='F2DCDB';
