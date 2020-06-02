@@ -177,6 +177,7 @@ exports.getPptx = async (req, res, next) => {
         var exercise = await exercisedBudget.find({ exerciseDate: { $gte: startDate, $lte: endDate }});
         // Busca en la base de datos el último HojaCopade
         var hojayCopade = await HojaCopade.findOne().sort({createdAt: -1});
+        // Busca en la base de datos el último Pedidos con recepción
         var received = await receivedBudget.findOne().sort({receivedDate: -1});
         var exerciseChartRes = await exerciseChart.find({exerciseDate: {$gte: startDate, $lte:endDate}});
         if (hojayCopade === null || authorized === null || exercise.length === 0
@@ -399,7 +400,7 @@ exports.getPptx = async (req, res, next) => {
             x:0.5,
             y:1.6,
             w:9.0,
-            h:2,
+            h:2.5,
             catAxisLabelFontBold: true,
             catAxisLabelFontFace: 'Montserrat SemiBold',
             catAxisLabelFontSize: 15,
@@ -438,7 +439,6 @@ exports.getPptx = async (req, res, next) => {
         slide3.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
         // Slide 4
         let slide4 = pres.addSlide();
-
         var arrDataLineStat2 = [];
         var tmpObjRed1 = { name:'Ejercicio', labels:dias, values:totalEjercicio};
         arrDataLineStat2.push( tmpObjRed1 );
@@ -446,7 +446,7 @@ exports.getPptx = async (req, res, next) => {
             x:0.5,
             y:1.2,
             w:9.0,
-            h:5.2,
+            h:5.5,
             catAxisLabelFontBold: true,
             catAxisLabelFontFace: 'Montserrat SemiBold',
             catAxisLabelFontSize: 12,
@@ -480,18 +480,28 @@ exports.getPptx = async (req, res, next) => {
         slide4.addText(`Ejercicio presupuestal ${mesInicial} - ${mesFinal} ${ano}`, { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
         var x=1.07;
         var x2 = 1.05;
+        var x3 = 1.96;
         var bgcolor;
         var sumaSlide4= 0;
+        var chartSpace =  8.26 / exerciseChartRes.length; // Space per point in inch.
+        var lunesenMeses = [4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4];
+        var space = [];
+        for (let i = 0; i < lunesenMeses.length; i++) {
+            space.push(chartSpace*lunesenMeses[i]);
+        }
+        var middlemonth = 0;
         slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
-        console.log(monthDiff);
         for(let i = 0; i <= monthDiff; i++) {
+            console.log(i);
             sumaSlide4 = sumaSlide4 + parseInt(realTable[i]);
+            middlemonth = middlemonth + lunesenMeses[i];
             (i%2===0) ? bgcolor = 'E6B8B7' : bgcolor ='F2DCDB';
-            slide4.addShape(pres.shapes.RECTANGLE,{ x:x2, y:1.7, w:1.63, h:3.64, fill:bgcolor });
+            slide4.addShape(pres.shapes.RECTANGLE,{ x:x2, y:2.01, w:space[i], h:4.07, fill:bgcolor });
             slide4.addText(anoSlide4[i], {x:x, y:1.66, w:2,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
-            slide4.addText(sumaSlide4, {x:x, y:3,w:0.8,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
-            x = x+1.63;
-            x2 =x2+1.63;
+            slide4.addText(sumaSlide4, {x:x3, y:3,w:0.8,h:0.4, color: '000000', fontFace:'Montserrat Regular', fontSize:18, bold: true });
+            x = x + space[i];
+            x2 = x2 + space[i];
+            x3 = x3 + space[i];
         }
         slide4.addTable(TablaDiapositiva4, {x:5.2, y:4.64, w: 4, align: 'center', fontFace:'Montserrat Regular', border: {color: 'FFFFFF', pt:1}});
         slide4.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
