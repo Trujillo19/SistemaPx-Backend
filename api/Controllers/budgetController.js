@@ -480,13 +480,14 @@ exports.postAuthorized = async (req, res, next) => {
 // Crea un documento de presupuesto ejercido con los datos de un archivo de Excel.
 exports.postExercised = async (req, res, next) => {
     // Si no existen los campos necesarios, envía un error 400.
-    if (!req.file || !req.body.sheetName || !req.body.inputDate){
+    if (!req.file || !req.body.sheetName || !req.body.inputDate || !req.body.addtoChart){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
     }
     // Variables de la petición
     var inputDate = new Date(req.body.inputDate + 'GMT-0600');
     var sheetName = req.body.sheetName;
     var filepath =  './' + req.file.path;
+    var addtoChart = req.body.addtoChart;
     var user = req.user;
     // Variables para almacenar el ejercicio por GM.
     var AA = 0;
@@ -576,8 +577,8 @@ exports.postExercised = async (req, res, next) => {
                 todosEjercicios[i].GMGE + todosEjercicios[i].GMM + todosEjercicios[i].GMOPI + todosEjercicios[i].CSTPIP
                 + todosEjercicios[i].GSMCCIT + todosEjercicios[i].GSSLT + todosEjercicios[i].GMSSTPA;
             }
-            // Crea un nuevo documento para el gráfico del ejercicio, lo que hace es sumar el nuevo ejercicio total y guardarlo.
-            await exerciseChart.create({createdBy: user, createdAt: Date.now(), exerciseDate: Date.now(), exerciseTotal:total});
+            // Si la opción es selecionada, crea un nuevo documento para el gráfico del ejercicio, lo que hace es sumar el nuevo ejercicio total y guardarlo.
+            if (String(addtoChart) == 'true') { await exerciseChart.create({createdBy: user, createdAt: Date.now(), exerciseDate: Date.now(), exerciseTotal:total}); }
             // Envía la respuesta al cliente
             res.status(201).json({
                 status: 'Created',
