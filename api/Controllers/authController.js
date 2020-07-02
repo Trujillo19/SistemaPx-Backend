@@ -127,6 +127,9 @@ exports.protect = async (req, res, next) => {
         next();
 
     } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return next(new AppError(401, 'Unauthorized', 'Token expirado.'), req, res, next);
+        }
         next(err);
     }
 };

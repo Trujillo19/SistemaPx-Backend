@@ -77,6 +77,9 @@ exports.getBudget = async (req, res, next) => {
         }
         // Busca en la base de datos el autorizado que se requiere.
         var authorized = await authorizedBudget.findOne({authName});
+        if (authorized === null || authorized.length === 0){
+            return next(new AppError(404, 'Not found', `No hay información de ${authName}`));
+        }
         // Sumar el autorizado de los meses que se solicitan
         for (let j = startMonth; j <= startMonth + monthDiff; j++) {
             a_AA = a_AA + authorized.AA[j];
@@ -140,9 +143,52 @@ exports.getBudget = async (req, res, next) => {
         var avanceTotal = e_Total / a_Total;
         var recepcionadoTotal = recepcionadoSPRN + recepcionadoSASEP + recepcionadoSSSTPA;
         var avanceEsperadoTotal = (recepcionadoTotal + e_Total) / a_Total;
+        // Last Update
+        var lastUpdateDate = exercise[exercise.length-1].exerciseDate;
+        var lastUpdateMonth = lastUpdateDate.getMonth();
+        switch (lastUpdateMonth) {
+            case 0:
+                lastUpdateMonth = 'enero';
+                break;
+            case 1:
+                lastUpdateMonth = 'febrero';
+                break;
+            case 2:
+                lastUpdateMonth = 'marzo';
+                break;
+            case 3:
+                lastUpdateMonth = 'abril';
+                break;
+            case 4:
+                lastUpdateMonth = 'mayo';
+                break;
+            case 5:
+                lastUpdateMonth = 'junio';
+                break;
+            case 6:
+                lastUpdateMonth = 'julio';
+                break;
+            case 7:
+                lastUpdateMonth = 'agosto';
+                break;
+            case 8:
+                lastUpdateMonth = 'septiembre';
+                break;
+            case 9:
+                lastUpdateMonth = 'octubre';
+                break;
+            case 10:
+                lastUpdateMonth = 'noviembre';
+                break;
+            case 11:
+                lastUpdateMonth = 'diciembre';
+                break;
+        }
+        var lastUpdate = `${lastUpdateDate.getDate()} de ${lastUpdateMonth} de ${lastUpdateDate.getFullYear()}`;
         // Se envía la respuesta al cliente.
         res.status(200).json({
             status: 'Success',
+            lastUpdate,
             data: [
                 {
                     'Subdirección':'SPRN APV',
@@ -230,7 +276,7 @@ exports.getBudget = async (req, res, next) => {
                 },
                 {
                     'Subdirección':'SPRN APV',
-                    'GM': 'Subtotal',
+                    'GM': 'SPRN APV',
                     'Autorizado': numeral(a_SPRN).divide(1000000).format('0.0'),
                     'Ejercicio': numeral(e_SPRN).divide(1000000).format('0.0'),
                     'Desviación': numeral(e_SPRN - a_SPRN).divide(1000000).format('0.0'),
@@ -286,7 +332,7 @@ exports.getBudget = async (req, res, next) => {
                 },
                 {
                     'Subdirección':'SASEP',
-                    'GM': 'Subtotal',
+                    'GM': 'SASEP',
                     'Autorizado': numeral(a_SASEP).divide(1000000).format('0.0'),
                     'Ejercicio': numeral(e_SASEP).divide(1000000).format('0.0'),
                     'Desviación': numeral(e_SASEP - a_SASEP).divide(1000000).format('0.0'),
@@ -313,7 +359,7 @@ exports.getBudget = async (req, res, next) => {
                 },
                 {
                     'Subdirección':'SSSTPA',
-                    'GM': 'Subtotal',
+                    'GM': 'SSSTPA',
                     'Autorizado': numeral(a_SSSTPA).divide(1000000).format('0.0'),
                     'Ejercicio': numeral(e_SSSTPA).divide(1000000).format('0.0'),
                     'Desviación': numeral(e_SSSTPA - a_SSSTPA).divide(1000000).format('0.0'),
@@ -327,7 +373,7 @@ exports.getBudget = async (req, res, next) => {
                 },
                 {
                     'Subdirección':'Total Inversión',
-                    'GM': ' ',
+                    'GM': 'TOTAL',
                     'Autorizado': numeral(a_Total).divide(1000000).format('0.0'),
                     'Ejercicio': numeral(e_Total).divide(1000000).format('0.0'),
                     'Desviación': numeral(e_Total - a_Total).divide(1000000).format('0.0'),
@@ -346,6 +392,28 @@ exports.getBudget = async (req, res, next) => {
         // Si hay algún error, logealo y envíalo al siguiente middleware.
         console.log(err);
         next(err);
+    }
+};
+// Regresa los datos de la gráfica
+exports.getChart = async (req,res,next) => {
+    try {
+        var dias = [];
+        var totalEjercicio = [];
+        var exerciseChartRes = await exerciseChart.find();
+        for (let i = 0; i < exerciseChartRes.length; i++) {
+            dias.push(exerciseChartRes[i].exerciseDate.toISOString().split('T')[0]);
+            totalEjercicio.push(numeral(exerciseChartRes[i].exerciseTotal).divide(1000000).format('0.0'));
+        }
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                dias,
+                totalEjercicio
+            }
+        });
+    } catch (err) {
+        next(err);
+        console.log(err);
     }
 };
 // Crea un documento de presupuesto autorizado con los datos de un archivo de Excel.
@@ -476,7 +544,39 @@ exports.postAuthorized = async (req, res, next) => {
         next(err);
     }
 };
-
+exports.postAuthorizedSimple = async (req, res, next) => {
+    try {
+        if (!req.body.a_AA || !req.body.a_CGDUOS || !req.body.a_GMDE || !req.body.a_GMGE || !req.body.a_GMM
+            || !req.body.a_GMOPI || !req.body.a_CSTPIP || !req.body.a_GSMCCIT|| !req.body.a_GSSLT
+            || !req.body.a_GMSSTPA || !req.body.authName){
+            return next(new AppError(400, 'Bad Request', 'No están presentes los archivos o parámetros '));
+        }
+        var AA = req.body.a_AA;
+        var CGDUOS = req.body.a_CGDUOS;
+        var GMDE = req.body.a_GMDE;
+        var GMGE = req.body.a_GMGE;
+        var GMM = req.body.a_GMM;
+        var GMOPI = req.body.a_GMOPI;
+        var CSTPIP = req.body.a_CSTPIP;
+        var GSMCCIT = req.body.a_GSMCCIT;
+        var GSSLT = req.body.a_GSSLT;
+        var GMSSTPA = req.body.a_GMSSTPA;
+        var authName = req.body.authName;
+        var user = req.user;
+        var autorizado = await authorizedBudget.create({createdBy: user, createdAt: Date.now(),
+            authName, AA, CGDUOS, GMDE, GMGE, GMM, GMOPI, CSTPIP, GSMCCIT, GSSLT, GMSSTPA});
+        // Se envía la respuesta al cliente.
+        res.status(201).json({
+            status: 'Created',
+            data: {
+                autorizado
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        next(e);
+    }
+};
 // Crea un documento de presupuesto ejercido con los datos de un archivo de Excel.
 exports.postExercised = async (req, res, next) => {
     // Si no existen los campos necesarios, envía un error 400.
@@ -596,6 +696,37 @@ exports.postExercised = async (req, res, next) => {
         next(err);
     }
 };
+// Obtiene todos los ejercicios
+exports.getExercised = async (req, res, next) => {
+    try {
+        var exercise = await exercisedBudget.find().sort({'exerciseDate': -1}).limit(10);
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                exercise
+            }
+        });
+    } catch (e) {
+        next (e);
+        console.log(e);
+    }
+};
+// Elimina un ejercicio
+exports.deleteExercised = async (req,res, next) => {
+    try {
+        var id = req.params.id;
+        var deleted = await exercisedBudget.findByIdAndDelete(id);
+        res.status(200).json({
+            status: 'Deleted',
+            data: {
+                exercise: deleted
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        next(e);
+    }
+};
 
 // Crea un documento de los COPADEs con los datos de un archivo de Excel.
 exports.postCopades = async (req, res, next) => {
@@ -654,6 +785,39 @@ exports.postCopades = async (req, res, next) => {
     }
 };
 
+exports.getCopades = async (req, res, next) => {
+    try {
+        var copades = await copadeBudget.find().sort({'CopadeDate': -1}).limit(10);
+        for (let i = 0; i < copades.length; i++){
+            copades[i].COPADEs = undefined;
+        }
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                copades
+            }
+        });
+    } catch (e) {
+        next (e);
+        console.log(e);
+    }
+};
+
+exports.deleteCopades = async (req, res, next) => {
+    try {
+        var id = req.params.id;
+        var deleted = await copadeBudget.findByIdAndDelete(id);
+        res.status(200).json({
+            status: 'Deleted',
+            data: {
+                exercise: deleted
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        next(e);
+    }
+};
 // Crea un documento de los pedidos con recepción con los datos de un archivo de Excel.
 exports.postReceived = async (req, res, next) => {
     // Si no existen los campos necesarios, envía un error 400.
@@ -863,6 +1027,37 @@ exports.postReceived = async (req, res, next) => {
     }
 };
 
+exports.getReceived = async (req, res, next) => {
+    try {
+        var received = await receivedBudget.find().sort({'receivedDate': -1}).limit(10);
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                received
+            }
+        });
+    } catch (e) {
+        next (e);
+        console.log(e);
+    }
+};
+
+exports.deleteReceived = async (req, res, next) => {
+    try {
+        var id = req.params.id;
+        var deleted = await receivedBudget.findByIdAndDelete(id);
+        res.status(200).json({
+            status: 'Deleted',
+            data: {
+                exercise: deleted
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        next(e);
+    }
+};
+
 // Crea un documento con los avances del ejercicio
 exports.postExerciseChart = async (req, res, next) => {
     // Si no existen los campos necesarios, envía un error 400.
@@ -889,7 +1084,36 @@ exports.postExerciseChart = async (req, res, next) => {
         next(err);
     }
 };
+exports.getExerciseChart = async (req, res, next) => {
+    try {
+        var chart = await exerciseChart.find().sort({'exerciseDate': -1}).limit(10);
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                chart
+            }
+        });
+    } catch (e) {
+        next (e);
+        console.log(e);
+    }
+};
 
+exports.deleteExerciseChart = async (req, res, next) => {
+    try {
+        var id = req.params.id;
+        var deleted = await exerciseChart.findByIdAndDelete(id);
+        res.status(200).json({
+            status: 'Deleted',
+            data: {
+                exercise: deleted
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        next(e);
+    }
+};
 
 // Eliminar esta
 exports.getPresentation = async (req, res, next) => {

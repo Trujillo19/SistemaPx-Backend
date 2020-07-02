@@ -29,11 +29,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: false
     },
+    profile_picture: {
+        type: String,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
     }
-
 });
 
 userSchema.pre('save', async (next) => {

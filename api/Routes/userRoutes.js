@@ -10,5 +10,6 @@ router.post('/signup', authController.signup);
 // Protected Routes. Only login User can access.
 router.use(authController.protect);
 router.get('/:id', userController.userDetail);
+router.put('/:id', userController.updateDetails);
 
 module.exports = router;
