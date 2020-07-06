@@ -144,7 +144,7 @@ exports.getBudget = async (req, res, next) => {
         var recepcionadoTotal = recepcionadoSPRN + recepcionadoSASEP + recepcionadoSSSTPA;
         var avanceEsperadoTotal = (recepcionadoTotal + e_Total) / a_Total;
         // Last Update
-        var lastUpdateDate = exercise[exercise.length-1].exerciseDate;
+        var lastUpdateDate = exercise[exercise.length-1].createdAt;
         var lastUpdateMonth = lastUpdateDate.getMonth();
         switch (lastUpdateMonth) {
             case 0:
@@ -1461,6 +1461,24 @@ exports.getPresentation = async (req, res, next) => {
                 break;
             case 5:
                 mes = 'junio';
+                break;
+            case 6:
+                mes = 'julio';
+                break;
+            case 7:
+                mes = 'agosto';
+                break;
+            case 8:
+                mes = 'septiembre';
+                break;
+            case 9:
+                mes = 'octubre';
+                break;
+            case 10:
+                mes = 'noviembre';
+                break;
+            case 11:
+                mes = 'diciembre';
                 break;
         }
         var ano = today.getFullYear();
