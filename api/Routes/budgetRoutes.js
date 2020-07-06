@@ -36,8 +36,6 @@ router.post('/exercisechart', budgetController.postExerciseChart);
 router.get('/exercisechart', budgetController.getExerciseChart);
 router.delete('/exercisechart/:id', budgetController.deleteExerciseChart);
 
-router.get('/pptx', budgetController.getPresentation);
-
 
 module.exports = router;
 

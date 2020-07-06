@@ -7,7 +7,10 @@ const AppError = require('../Helpers/appError');
 const numeral = require('../Helpers/numeral');
 const pptxgen = require('pptxgenjs');
 
+
 exports.getPptx = async (req, res, next) => {
+    // Array to convert date from 0 to 11 to a month.
+    const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     // Si no existen los campos necesarios, envía un error 400.
     if (!req.query.startDate || !req.query.endDate || !req.query.authName){
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
@@ -92,83 +95,8 @@ exports.getPptx = async (req, res, next) => {
     var sumaContadorCopade = 0;
     var anoSlide4 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     // Switch para darle nombre a cada mes
-    switch (startDate.getMonth()) {
-        case 0:
-            mesInicial = 'enero';
-            break;
-        case 1:
-            mesInicial = 'febrero';
-            break;
-        case 2:
-            mesInicial = 'marzo';
-            break;
-        case 3:
-            mesInicial = 'abril';
-            break;
-        case 4:
-            mesInicial = 'mayo';
-            break;
-        case 5:
-            mesInicial = 'junio';
-            break;
-        case 6:
-            mesInicial = 'julio';
-            break;
-        case 7:
-            mesInicial = 'agosto';
-            break;
-        case 8:
-            mesInicial = 'septiembre';
-            break;
-        case 9:
-            mesInicial = 'octubre';
-            break;
-        case 10:
-            mesInicial = 'noviembre';
-            break;
-        case 11:
-            mesInicial = 'diciembre';
-            break;
-    }
-    // Switch para darle nombre a cada mes
-    switch (endDate.getMonth()) {
-        case 0:
-            mesFinal = 'enero';
-            break;
-        case 1:
-            mesFinal = 'febrero';
-            break;
-        case 2:
-            mesFinal = 'marzo';
-            break;
-        case 3:
-            mesFinal = 'abril';
-            break;
-        case 4:
-            mesFinal = 'mayo';
-            break;
-        case 5:
-            mesFinal = 'junio';
-            break;
-        case 6:
-            mesFinal = 'julio';
-            break;
-        case 7:
-            mesFinal = 'agosto';
-            break;
-        case 8:
-            mesFinal = 'septiembre';
-            break;
-        case 9:
-            mesFinal = 'octubre';
-            break;
-        case 10:
-            mesFinal = 'noviembre';
-            break;
-        case 11:
-            mesFinal = 'diciembre';
-            break;
-    }
+    mesInicial = MESES[startDate.getMonth()];
+    mesFinal = MESES[endDate.getMonth()];
     // Bloque Try - Catch
     try {
         // Busca en la base de datos el autorizado solicitado en la petición
@@ -348,27 +276,7 @@ exports.getPptx = async (req, res, next) => {
         pres.layout = 'LAYOUT_4x3';
         var today = exercise[exercise.length-1].createdAt;
         var dia = today.getDate();
-        var mes;
-        switch (today.getMonth()) {
-            case 0:
-                mes = 'enero';
-                break;
-            case 1:
-                mes = 'febrero';
-                break;
-            case 2:
-                mes = 'marzo';
-                break;
-            case 3:
-                mes = 'abril';
-                break;
-            case 4:
-                mes = 'mayo';
-                break;
-            case 5:
-                mes = 'junio';
-                break;
-        }
+        var mes = MESES[today.getMonth()];
         var ano = today.getFullYear();
         var filename = `Estado-actual-ppto-${dia}-${mes}-${ano}`;
         // Slide 1
@@ -393,7 +301,7 @@ exports.getPptx = async (req, res, next) => {
         var Meses = ['Ene','Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul','Ago','Sep', 'Oct','Nov','Dic'];
         var arrDataLineStat = [];
         var tmpObjRed = { name:'REAL', labels:Meses, values:realChart};
-        var tmpObjAmb = { name:'ADEC II', labels:Meses, values:adecChart};
+        var tmpObjAmb = { name:'ADEC III', labels:Meses, values:adecChart};
         arrDataLineStat.push( tmpObjRed );
         arrDataLineStat.push( tmpObjAmb );
         var optsChartLine1 = {
@@ -422,7 +330,7 @@ exports.getPptx = async (req, res, next) => {
             dataLabelFontSize: 14,
             dataLabelPosition: 't'
         };
-        var AdecuadoAnual = [{ text: 'ADEC II', options: { fill: '606060' } }, adecChart[0],adecChart[1],adecChart[2],adecChart[3],adecChart[4],adecChart[5],adecChart[6],adecChart[7],adecChart[8],adecChart[9],adecChart[10],adecChart[11],adecTableSuma];
+        var AdecuadoAnual = [{ text: 'ADEC III', options: { fill: '606060' } }, adecChart[0],adecChart[1],adecChart[2],adecChart[3],adecChart[4],adecChart[5],adecChart[6],adecChart[7],adecChart[8],adecChart[9],adecChart[10],adecChart[11],adecTableSuma];
         var AdecuadoReal = [{ text: 'REAL', options: { color: 'ff0000', fill: '606060' } }, realTable[0],realTable[1],realTable[2],realTable[3],realTable[4],realTable[5],realTable[6],realTable[7],realTable[8],realTable[9],realTable[10],realTable[11], { text: realTableSuma, options: { color: '691B31'}}];
         var TablaDiapositiva3 =  [];
         TablaDiapositiva3.push(AdecuadoAnual);
@@ -469,7 +377,7 @@ exports.getPptx = async (req, res, next) => {
             dataLabelPosition: 't'
         };
         var TablaDiapositiva4 = [];
-        var Cabezera = [{text: 'Periodo', options: {bold: true, color:'FFFFFF', fill:'42955B', fontSize: 12}},{text: 'Adec II', options:
+        var Cabezera = [{text: 'Periodo', options: {bold: true, color:'FFFFFF', fill:'42955B', fontSize: 12}},{text: 'Adec III', options:
              {bold: true,fill:'42955B', color:'FFFFFF', fontSize: 12}}, {text: 'Ejer', options: {bold: true, fill:'42955B',color:'FFFFFF', fontSize: 12}}, {text: '%', options: {bold: true, fill:'42955B',color:'FFFFFF', fontSize: 12}} ];
         var Datos = [{text: `${mesInicial} - ${mesFinal}`, options:{bold:true, fill:'CFDDD2', color:'000000', fontSize: 12}}, {text: `${tableInversion[1]}`, options:{bold:true, fill:'CFDDD2',color:'000000', fontSize: 12}}, {text: `${tableInversion[2]}`, options:{bold:true,fill:'CFDDD2', color:'000000', fontSize: 12}}, {text: `${tableInversion[4]}`, options:{bold:true, color:'000000', fill:'CFDDD2',fontSize: 12}}];
         TablaDiapositiva4.push(Cabezera);
@@ -492,7 +400,6 @@ exports.getPptx = async (req, res, next) => {
         var middlemonth = 0;
         slide4.addChart( pres.charts.LINE, arrDataLineStat2, optsChartLine3);
         for(let i = 0; i <= monthDiff; i++) {
-            console.log(i);
             sumaSlide4 = sumaSlide4 + parseInt(realTable[i]);
             middlemonth = middlemonth + lunesenMeses[i];
             (i%2===0) ? bgcolor = 'E6B8B7' : bgcolor ='F2DCDB';
@@ -650,10 +557,10 @@ diapositiva6.addImage({ path:'./logo-mexico.png', x:8.05, y:0.11, w:1.45, h:0.54
 diapositiva6.addText('Recepcionado', { shape:pres.shapes.RECTANGLE, x:0.14, y:0.93, w:9.68, h:0.45, fill:'691B31', align:'left', fontFace:'Montserrat Regular', fontSize:20, bold: true, color: 'FFFFFF' });
 diapositiva6.addImage({ path:'./logo-pemex.png', x:8.4, y:6.57, w:1.42, h:0.66 });
 diapositiva6.addText('Cifras en millones de pesos', { x: 6.6, y: 0.98, w: 3.2, h:0.29, color: 'FFFFFF', align: 'center', fontFace:'Montserrat Regular', fontSize: 17, bold:true});
-diapositiva6.addText('Hoja de entrada', { x: 1.4, y: 1.52, w: 2.3, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
-diapositiva6.addTable(HojadeEntradaTable, { x: 1.4, y: 1.9, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center',colW: [3.5,2,2], border: {color: 'ffffff', pt:1}});
-diapositiva6.addText('COPADES', { x: 1.4, y: 4.04, w: 1.43, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 20, bold:true});
-diapositiva6.addTable(COPADETable, { x: 1.4, y: 4.55, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', colW: [3.5,2,2], border: {color: 'ffffff', pt:1}});
+diapositiva6.addText('Hoja de entrada', { x: 1.4, y: 1.52, w: 2.3, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
+diapositiva6.addTable(HojadeEntradaTable, { x: 1.4, y: 1.9, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center',colW: [3.5,2,2], fontSize: 10.5, border: {color: 'ffffff', pt:1}});
+diapositiva6.addText('COPADES', { x: 1.4, y: 4.04, w: 1.43, h:0.38, color: '000000', align: 'left', fontFace:'Montserrat Regular', fontSize: 18, bold:true});
+diapositiva6.addTable(COPADETable, { x: 1.4, y: 4.55, w: 7.5, fill: 'C0504D', color:'FFFFFF', bold:true, align:'center', colW: [3.5,2,2], fontSize: 10.5, border: {color: 'ffffff', pt:1}});
 diapositiva6.addText(`Fecha de extracción: ${dia} de ${mes} de ${ano}`, { x: 0.16, y: 7, w: 3, h:0.27, color: '000000', align: 'center', fontFace:'Arial', fontSize: 10, bold:false});
 // Slide 7
 let slide7 = pres.addSlide();
