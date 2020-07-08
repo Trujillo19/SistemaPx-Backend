@@ -6,6 +6,7 @@ const HojaCopade = require('../Models/HojaCopadeModel');
 const AppError = require('../Helpers/appError');
 const numeral = require('../Helpers/numeral');
 const pptxgen = require('pptxgenjs');
+const moment = require('moment-timezone');
 
 
 exports.getPptx = async (req, res, next) => {
@@ -16,10 +17,10 @@ exports.getPptx = async (req, res, next) => {
         return next(new AppError(400, 'Bad Request', 'File or parameters are not present'));
     }
     // Variables de la petición
-    const startDate = new Date(req.query.startDate+ 'GMT-0600');
-    const endDate = new Date(req.query.endDate+ 'GMT-0600');
+    const startDate = moment(req.query.startDate).tz('America/Mexico_City').format();
+    const endDate = moment(req.query.endDate).add(23, 'h').add(59, 'm').tz('America/Mexico_City').format();
     const authName = req.query.authName;
-    var monthDiff = endDate.getMonth() - startDate.getMonth();
+    var monthDiff = moment(endDate).month() - moment(startDate).month();
     // Si la fecha inicial es antes que la fecha de final, enviar un error 400.
     if (endDate - startDate < 0 ) {
         return next(new AppError(400, 'Bad Request', 'Start date must be earlier than end date'));
@@ -95,8 +96,8 @@ exports.getPptx = async (req, res, next) => {
     var sumaContadorCopade = 0;
     var anoSlide4 = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
     // Switch para darle nombre a cada mes
-    mesInicial = MESES[startDate.getMonth()];
-    mesFinal = MESES[endDate.getMonth()];
+    mesInicial = MESES[moment(startDate).month()];
+    mesFinal = MESES[moment(endDate).month()];
     // Bloque Try - Catch
     try {
         // Busca en la base de datos el autorizado solicitado en la petición
@@ -159,7 +160,7 @@ exports.getPptx = async (req, res, next) => {
         }
         entradaTotal.push(sumaImporteEntrada);
         entradaTotal.push(sumaContadorEntrada);
-        for (let j = startDate.getMonth(); j <= startDate.getMonth() + monthDiff; j++){
+        for (let j = moment(startDate).month(); j <= moment(startDate).month() + monthDiff; j++){
             a_AA = a_AA + authorized.AA[j];
             a_CGDUOS = a_CGDUOS + authorized.CGDUOS[j];
             a_GMDE = a_GMDE + authorized.GMDE[j];

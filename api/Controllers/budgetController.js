@@ -8,7 +8,7 @@ const sorter = require('../Helpers/sortExercise');
 const HojaCopade = require('../Models/HojaCopadeModel');
 const exerciseChart = require('../Models/exerciseChartModel');
 const copadeBudget = require('../Models/CopadeBugdetModel');
-
+const moment = require('moment-timezone');
 
 // Regresa el autorizado, ejercicio y pedidos con recepción para llenar la tabla.
 exports.getBudget = async (req, res, next) => {
@@ -678,7 +678,7 @@ exports.postExercised = async (req, res, next) => {
                 + todosEjercicios[i].GSMCCIT + todosEjercicios[i].GSSLT + todosEjercicios[i].GMSSTPA;
             }
             // Si la opción es selecionada, crea un nuevo documento para el gráfico del ejercicio, lo que hace es sumar el nuevo ejercicio total y guardarlo.
-            if (String(addtoChart) == 'true') { await exerciseChart.create({createdBy: user, createdAt: Date.now(), exerciseDate: Date.now(), exerciseTotal:total}); }
+            if (String(addtoChart) == 'true') { await exerciseChart.create({createdBy: user, createdAt: moment().tz('America/Mexico_City').format(), exerciseDate: moment().tz('America/Mexico_City').format(), exerciseTotal:total}); }
             // Envía la respuesta al cliente
             res.status(201).json({
                 status: 'Created',
@@ -1114,5 +1114,6 @@ exports.deleteExerciseChart = async (req, res, next) => {
         next(e);
     }
 };
+
 
 
