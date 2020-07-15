@@ -24,13 +24,15 @@ exports.userDetail = async (req, res, next) => {
 
 exports.updateDetails = async (req, res, next) => {
     try {
+        var profile_picture;
         if (!req.body.id || !req.body.firstName || !req.body.lastName || !req.body.email) {
             return next(new AppError(400, 'Bad Request', 'No hay suficientes parámetros o son inválidos.'));
         }
         if (req.params.id !== req.user) {
             return next(new AppError(403, 'Forbidden', 'No puedes ver el perfil de otra persona.'), req, res, next);
         }
-        newuser = {firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email};
+        (req.body.profile_picture) ? profile_picture = req.body.profile_picture : profile_picture = undefined;
+        newuser = {firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email, profile_picture};
         const user = await User.findByIdAndUpdate({_id: req.user}, newuser,  {returnOriginal: false});
         user.password = undefined;
         res.status(200).json({

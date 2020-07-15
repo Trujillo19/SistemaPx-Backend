@@ -11,6 +11,7 @@ const cors = require('cors');
 const userRoutes = require('./api/Routes/userRoutes');
 const budgetRoutes = require('./api/Routes/budgetRoutes');
 const pptxRoutes = require('./api/Routes/pptxRoutes');
+const awsRoutes = require('./api/Routes/awsRoutes');
 
 // Error handler
 const globalErrHandler = require('./api/Controllers/errorController');
@@ -44,6 +45,7 @@ app.use(hpp());
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budget', budgetRoutes);
 app.use('/api/v1/pptx', pptxRoutes);
+app.use('/api/v1/aws', awsRoutes);
 
 // Handler for undefined routes
 app.use('*', (req,res,next) => {
